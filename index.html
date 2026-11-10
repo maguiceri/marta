@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Marta Agencia Web</title>
-<meta name="description" content="marta marketing digital: branding, redes y contenido y fotografía.">
+<meta name="description" content="marta marketing digital: las ideas sin estrategia son puro humo. Social media, branding y diseño, y publicidad en Meta Ads.">
 <link rel="icon" href="img/a.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,12 +44,9 @@
 </header>
 
 <main>
-<!-- Inicio: una sola pantalla fija para portada, servicios y proyectos. Primero la intro; al bajar,
-     el resto del logo se desvanece, la "a" queda sola, viaja a la derecha y se vuelve la ventana
-     donde se muestran los servicios; al final la foto ocupa la pantalla y entran los proyectos. -->
+<!-- Inicio: una pantalla. Primero la intro; al terminar, el logo se corre al costado
+     y al lado aparece la presentación. -->
 <section class="inicio" id="inicio">
-  <span class="ancla ancla-serv" id="servicios" aria-hidden="true"></span>
-  <span class="ancla ancla-proy" id="proyectos" aria-hidden="true"></span>
   <div class="inicio-pin">
 
     <div class="foco portada" id="portada">
@@ -65,7 +62,7 @@
         </h1>
         <span class="dato d1">Agencia de marketing digital</span>
         <span class="dato d2">Buenos Aires</span>
-        <span class="dato d3">Branding · Contenido · Fotografía</span>
+        <span class="dato d3">Social media · Branding · Meta Ads</span>
         <span class="dato d4">Scroll</span>
       </div>
       <div class="foco-blur" aria-hidden="true"></div>
@@ -73,108 +70,107 @@
       <button class="saltar" id="saltar" type="button">Saltar intro</button>
     </div>
 
-    <div class="serv-panel">
-      <div class="serv-izq">
-        <span class="kicker" data-mov="izq"><span>Servicios · <b class="serv-contador">01</b> / 03</span></span>
-        <h2 class="serv-titulo" id="serv-titulo"><span class="serv-grande" data-letras>servicios</span><span class="serv-sub" data-letras>qué hacemos</span></h2>
-        <ol class="serv-lista">
-          <li><button class="serv-item" type="button" data-mov="izq" style="--d: .15s"><span class="serv-num">01</span><span class="serv-nombre">branding</span></button></li>
-          <li><button class="serv-item" type="button" data-mov="izq" style="--d: .22s"><span class="serv-num">02</span><span class="serv-nombre">redes y contenido</span></button></li>
-          <li><button class="serv-item" type="button" data-mov="izq" style="--d: .29s"><span class="serv-num">03</span><span class="serv-nombre">fotografía</span></button></li>
-        </ol>
-        <div class="serv-textos">
-          <div class="serv-texto">
-            <p data-palabras>Creamos o renovamos la identidad de tu marca: concepto, logo, paleta, tipografías y un manual para que todo se aplique igual en cada pieza.</p>
-            <ul class="chips" data-mov="abajo" style="--d: .3s"><li>Naming</li><li>Logo</li><li>Manual de marca</li><li>Papelería</li></ul>
-          </div>
-          <div class="serv-texto">
-            <p data-palabras>Planificamos y producimos el contenido de tus redes con ritmo: piezas con diseño, fotos que se lucen solas y un feed que no cansa.</p>
-            <ul class="chips" data-mov="abajo" style="--d: .3s"><li>Estrategia</li><li>Grilla mensual</li><li>Reels</li><li>Copywriting</li></ul>
-          </div>
-          <div class="serv-texto">
-            <p data-palabras>Producimos y dirigimos sesiones de foto y video con el tratamiento de cada marca: blanco y negro, filtros, vidrios y encuadres pensados.</p>
-            <ul class="chips" data-mov="abajo" style="--d: .3s"><li>Producción</li><li>Dirección de arte</li><li>Edición</li><li>Video</li></ul>
-          </div>
-        </div>
+    <div class="presenta">
+      <div class="presenta-texto">
+        <span class="kicker" data-mov="izq">marta · marketing digital</span>
+        <h2 class="presenta-titulo"><span data-letras>las ideas sin estrategia son puro humo.</span> <span class="presenta-cosas" data-letras>acá preferimos que pasen cosas<span class="guion">_</span></span></h2>
+        <p class="presenta-bajada" data-palabras>Construimos marcas con pensamiento estratégico, creatividad y acciones que responden a un objetivo.</p>
+        <a class="btn btn-grande" href="#contacto" data-mov="abajo" style="--d: .35s">Quiero estrategia, no humo <span class="flecha" aria-hidden="true">↗</span></a>
       </div>
-      <!-- lugar donde termina la "a"; la ubica el CSS y main.js lleva la ventana hasta acá -->
-      <div class="a-destino" aria-hidden="true"></div>
+      <!-- lugar donde termina el logo; lo ubica el CSS y main.js lo lleva hasta acá -->
+      <div class="logo-destino" aria-hidden="true"></div>
     </div>
 
-    <!-- la "a" suelta: una ventana con forma de "a" (máscara) con una tira de imágenes adentro -->
-    <div class="a-ventana vidrio" aria-hidden="true">
-      <div class="lente">
-        <div class="a-tira">
-          <div class="foto-a" style="background-image: url(img/ejemplos/serv-branding.jpg)"></div>
-          <div class="foto-a" style="background-image: url(img/ejemplos/serv-redes.jpg)"></div>
-          <div class="foto-a" style="background-image: url(img/ejemplos/serv-foto.jpg)"></div>
-        </div>
-        <div class="a-tinta"></div>
-      </div>
-      <svg class="a-borde" viewBox="377 64 228 209" preserveAspectRatio="none"><use href="#logo-a" vector-effect="non-scaling-stroke"/></svg>
-    </div>
-    <div class="a-esquinas" aria-hidden="true"><span class="esq tl"></span><span class="esq tr"></span><span class="esq bl"></span><span class="esq br"></span></div>
+  </div>
+</section>
 
-    <!-- Proyectos: cada uno entra a través del vidrio estriado (franjas que arma main.js);
-         la primera capa es un puente con la foto con la que terminan los servicios -->
-    <section class="proy-capas" aria-labelledby="proy-titulo">
-      <h2 class="sr" id="proy-titulo">Proyectos</h2>
-      <div class="proy-capa puente" data-img="img/ejemplos/serv-foto.jpg" aria-hidden="true"><div class="proy-foto"></div></div>
-      <article class="proy-capa tinta-naranja" data-img="img/ejemplos/proy-1.jpg">
-        <div class="proy-foto" aria-hidden="true"></div>
-        <div class="proy-info">
-          <span class="kicker" data-mov="izq"><span>Proyectos · <b>01</b> / 06</span></span>
-          <h3 class="proy-titulo" data-letras>línea naranja<span class="guion">_</span></h3>
-          <span class="proy-reflejo" aria-hidden="true" data-mov="abajo" style="--d: .35s">línea naranja_</span>
-          <p class="proy-datos" data-mov="der" style="--d: .4s"><span>Cafetería de especialidad</span><span>Branding · Fotografía</span><span>2026</span></p>
-        </div>
-      </article>
-      <article class="proy-capa" data-img="img/ejemplos/proy-2.jpg">
-        <div class="proy-foto" aria-hidden="true"></div>
-        <div class="proy-info">
-          <span class="kicker" data-mov="izq"><span>Proyectos · <b>02</b> / 06</span></span>
-          <h3 class="proy-titulo" data-letras>quieto<span class="guion">_</span></h3>
-          <span class="proy-reflejo" aria-hidden="true" data-mov="abajo" style="--d: .35s">quieto_</span>
-          <p class="proy-datos" data-mov="der" style="--d: .4s"><span>Estudio de yoga</span><span>Redes · Fotografía</span><span>2025</span></p>
-        </div>
-      </article>
-      <article class="proy-capa tinta-naranja" data-img="img/ejemplos/proy-3.jpg">
-        <div class="proy-foto" aria-hidden="true"></div>
-        <div class="proy-info">
-          <span class="kicker" data-mov="izq"><span>Proyectos · <b>03</b> / 06</span></span>
-          <h3 class="proy-titulo" data-letras>nocturna<span class="guion">_</span></h3>
-          <span class="proy-reflejo" aria-hidden="true" data-mov="abajo" style="--d: .35s">nocturna_</span>
-          <p class="proy-datos" data-mov="der" style="--d: .4s"><span>Bar y espacio cultural</span><span>Redes y contenido</span><span>2025</span></p>
-        </div>
-      </article>
-      <article class="proy-capa" data-img="img/ejemplos/proy-4.jpg">
-        <div class="proy-foto" aria-hidden="true"></div>
-        <div class="proy-info">
-          <span class="kicker" data-mov="izq"><span>Proyectos · <b>04</b> / 06</span></span>
-          <h3 class="proy-titulo" data-letras>a través<span class="guion">_</span></h3>
-          <span class="proy-reflejo" aria-hidden="true" data-mov="abajo" style="--d: .35s">a través_</span>
-          <p class="proy-datos" data-mov="der" style="--d: .4s"><span>Marca de iluminación</span><span>Branding · Fotografía</span><span>2026</span></p>
-        </div>
-      </article>
-      <article class="proy-capa" data-img="img/ejemplos/proy-5.jpg">
-        <div class="proy-foto" aria-hidden="true"></div>
-        <div class="proy-info">
-          <span class="kicker" data-mov="izq"><span>Proyectos · <b>05</b> / 06</span></span>
-          <h3 class="proy-titulo" data-letras>siesta<span class="guion">_</span></h3>
-          <span class="proy-reflejo" aria-hidden="true" data-mov="abajo" style="--d: .35s">siesta_</span>
-          <p class="proy-datos" data-mov="der" style="--d: .4s"><span>Tienda de muebles</span><span>Fotografía · Redes</span><span>2024</span></p>
-        </div>
-      </article>
-      <article class="proy-capa tinta-naranja" data-img="img/ejemplos/proy-6.jpg">
-        <div class="proy-foto" aria-hidden="true"></div>
-        <div class="proy-info">
-          <span class="kicker" data-mov="izq"><span>Proyectos · <b>06</b> / 06</span></span>
-          <h3 class="proy-titulo" data-letras>reflejo<span class="guion">_</span></h3>
-          <span class="proy-reflejo" aria-hidden="true" data-mov="abajo" style="--d: .35s">reflejo_</span>
-          <p class="proy-datos" data-mov="der" style="--d: .4s"><span>Consultora de bienestar</span><span>Branding</span><span>2024</span></p>
-        </div>
-      </article>
-    </section>
+<!-- Servicios: sin fotos; cada servicio en una fila grande -->
+<section class="servicios" id="servicios" aria-labelledby="serv-titulo">
+  <div class="ancho">
+    <span class="kicker" data-mov="izq">Servicios</span>
+    <h2 class="serv-titulo" id="serv-titulo" data-letras>te ayudamos a elegir qué necesita tu marca y eso también es estrategia<span class="guion">_</span></h2>
+    <ol class="serv-lista">
+      <li class="servicio" data-mov="abajo">
+        <span class="serv-num">01</span>
+        <h3 class="serv-nombre">social media</h3>
+        <p>Pensamos, creamos y gestionamos la comunicación de tu marca en redes sociales. Estrategia, contenido y creatividad para construir una presencia digital coherente, conectar con tu comunidad y alcanzar objetivos concretos.</p>
+      </li>
+      <li class="servicio" data-mov="abajo" style="--d: .08s">
+        <span class="serv-num">02</span>
+        <h3 class="serv-nombre">branding y diseño</h3>
+        <p>Construimos identidades con personalidad y diseñamos piezas que comunican. Desde el concepto y la identidad visual hasta las aplicaciones gráficas, para que tu marca tenga coherencia, carácter y algo propio que decir.</p>
+      </li>
+      <li class="servicio" data-mov="abajo" style="--d: .16s">
+        <span class="serv-num">03</span>
+        <h3 class="serv-nombre">publicidad en meta ads</h3>
+        <p>Diseñamos, gestionamos y optimizamos campañas en Meta Ads para conectar tu marca con las personas correctas. Estrategia, segmentación y análisis para transformar inversión publicitaria en oportunidades de negocio.</p>
+      </li>
+    </ol>
+    <a class="btn btn-grande" href="#contacto" data-mov="izq">Hablemos de tu marca <span class="flecha" aria-hidden="true">↗</span></a>
+  </div>
+</section>
+
+<!-- Proyectos: pantalla fija; cada proyecto entra a través del vidrio estriado (franjas que arma main.js) -->
+<section class="proy" id="proyectos" aria-labelledby="proy-titulo">
+  <div class="proy-pin">
+    <h2 class="sr" id="proy-titulo">Proyectos</h2>
+    <article class="proy-capa tinta-naranja" data-img="img/ejemplos/proy-1.jpg">
+      <div class="proy-foto" aria-hidden="true"></div>
+      <div class="proy-info">
+        <span class="kicker" data-mov="izq"><span>Proyectos · <b>01</b> / 06</span></span>
+        <h3 class="proy-titulo" data-letras>línea naranja<span class="guion">_</span></h3>
+        <span class="proy-reflejo" aria-hidden="true" data-mov="abajo" style="--d: .35s">línea naranja_</span>
+        <p class="proy-datos" data-mov="der" style="--d: .4s"><span>Cafetería de especialidad</span><span>Branding y diseño · Social media</span><span>2026</span></p>
+      </div>
+    </article>
+    <article class="proy-capa" data-img="img/ejemplos/proy-2.jpg">
+      <div class="proy-foto" aria-hidden="true"></div>
+      <div class="proy-info">
+        <span class="kicker" data-mov="izq"><span>Proyectos · <b>02</b> / 06</span></span>
+        <h3 class="proy-titulo" data-letras>quieto<span class="guion">_</span></h3>
+        <span class="proy-reflejo" aria-hidden="true" data-mov="abajo" style="--d: .35s">quieto_</span>
+        <p class="proy-datos" data-mov="der" style="--d: .4s"><span>Estudio de yoga</span><span>Social media</span><span>2025</span></p>
+      </div>
+    </article>
+    <article class="proy-capa tinta-naranja" data-img="img/ejemplos/proy-3.jpg">
+      <div class="proy-foto" aria-hidden="true"></div>
+      <div class="proy-info">
+        <span class="kicker" data-mov="izq"><span>Proyectos · <b>03</b> / 06</span></span>
+        <h3 class="proy-titulo" data-letras>nocturna<span class="guion">_</span></h3>
+        <span class="proy-reflejo" aria-hidden="true" data-mov="abajo" style="--d: .35s">nocturna_</span>
+        <p class="proy-datos" data-mov="der" style="--d: .4s"><span>Bar y espacio cultural</span><span>Meta Ads · Social media</span><span>2025</span></p>
+      </div>
+    </article>
+    <article class="proy-capa" data-img="img/ejemplos/proy-4.jpg">
+      <div class="proy-foto" aria-hidden="true"></div>
+      <div class="proy-info">
+        <span class="kicker" data-mov="izq"><span>Proyectos · <b>04</b> / 06</span></span>
+        <h3 class="proy-titulo" data-letras>a través<span class="guion">_</span></h3>
+        <span class="proy-reflejo" aria-hidden="true" data-mov="abajo" style="--d: .35s">a través_</span>
+        <p class="proy-datos" data-mov="der" style="--d: .4s"><span>Marca de iluminación</span><span>Branding y diseño</span><span>2026</span></p>
+      </div>
+    </article>
+    <article class="proy-capa" data-img="img/ejemplos/proy-5.jpg">
+      <div class="proy-foto" aria-hidden="true"></div>
+      <div class="proy-info">
+        <span class="kicker" data-mov="izq"><span>Proyectos · <b>05</b> / 06</span></span>
+        <h3 class="proy-titulo" data-letras>siesta<span class="guion">_</span></h3>
+        <span class="proy-reflejo" aria-hidden="true" data-mov="abajo" style="--d: .35s">siesta_</span>
+        <p class="proy-datos" data-mov="der" style="--d: .4s"><span>Tienda de muebles</span><span>Social media · Meta Ads</span><span>2024</span></p>
+      </div>
+    </article>
+    <article class="proy-capa tinta-naranja" data-img="img/ejemplos/proy-6.jpg">
+      <div class="proy-foto" aria-hidden="true"></div>
+      <div class="proy-info">
+        <span class="kicker" data-mov="izq"><span>Proyectos · <b>06</b> / 06</span></span>
+        <h3 class="proy-titulo" data-letras>reflejo<span class="guion">_</span></h3>
+        <span class="proy-reflejo" aria-hidden="true" data-mov="abajo" style="--d: .35s">reflejo_</span>
+        <p class="proy-datos" data-mov="der" style="--d: .4s"><span>Consultora de bienestar</span><span>Branding y diseño</span><span>2024</span></p>
+      </div>
+    </article>
+  </div>
+</section>
+
   </div>
 </section>
 
@@ -221,9 +217,9 @@
         <fieldset data-mov="der" style="--d: .26s">
           <legend>Qué necesitás</legend>
           <div class="opciones">
-            <input type="checkbox" id="o1" name="servicio" value="branding"><label for="o1">Branding</label>
-            <input type="checkbox" id="o2" name="servicio" value="contenido"><label for="o2">Redes y contenido</label>
-            <input type="checkbox" id="o3" name="servicio" value="foto"><label for="o3">Fotografía</label>
+            <input type="checkbox" id="o1" name="servicio" value="social-media"><label for="o1">Social media</label>
+            <input type="checkbox" id="o2" name="servicio" value="branding"><label for="o2">Branding y diseño</label>
+            <input type="checkbox" id="o3" name="servicio" value="meta-ads"><label for="o3">Publicidad en Meta Ads</label>
             <input type="checkbox" id="o5" name="servicio" value="nose"><label for="o5">Todavía no sé</label>
           </div>
         </fieldset>

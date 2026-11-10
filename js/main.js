@@ -159,26 +159,21 @@
       const l = rel(objetivo);
       const pad = Math.max(18, l.h * .22);
       const p0 = { x: -s * 1.2, y: vh * .2, w: s, h: s };
-      const p1 = { x: vw * .72 - s / 2, y: vh * .1, w: s * 1.1, h: s * .8 };
       const p2 = { x: vw * .1, y: vh * .58, w: s * .9, h: s * .9 };
       const enObjetivo = { x: l.x - pad, y: l.y - pad, w: l.w + pad * 2, h: l.h + pad * 2 };
 
       ubicar(p0);
       caja.classList.add("visor-on");
-      await mover(p0, p1, 600, easeInOut);        if (estado.saltado) return;
-      await pausa(80);
-      await mover(p1, p2, 550, easeInOut);        if (estado.saltado) return;
-      await pausa(80);
-      await mover(p2, enObjetivo, 700, easeOut);  if (estado.saltado) return;
+      await mover(p0, p2, 500, easeInOut);        if (estado.saltado) return;
+      await mover(p2, enObjetivo, 550, easeOut);  if (estado.saltado) return;
 
       caja.classList.add("enfocado");
       await alEnfocar();                           if (estado.saltado) return;
-      await pausa(120);
+      await pausa(60);
 
       // el visor se abre y todo queda nítido
       caja.classList.add("abriendo");
-      await mover(enObjetivo, marco(), 650, easeInOut); if (estado.saltado) return;
-      await pausa(60);
+      await mover(enObjetivo, marco(), 450, easeInOut); if (estado.saltado) return;
       terminar();
     }
 
@@ -199,17 +194,17 @@
   const logo = portada.querySelector(".portada-logo");
   const stripLogo = logo.querySelector(".strip");
 
+  let alTerminarIntro = () => {};   // lo define "inicio": arranca la presentación
   const intro = foco(portada, {
     objetivo: logo,
-    alEnfocar: () => girar(stripLogo, 1000),   // la "a" gira como una tragamonedas
+    alEnfocar: () => girar(stripLogo, 800),   // la "a" gira como una tragamonedas
     alTerminar: () => {
       html.classList.remove("intro-on");
       document.getElementById("saltar")?.remove();
+      alTerminarIntro();
       pedir();
     }
   });
-  // al pasar el mouse, la "a" vuelve a girar (solo arriba de todo, mientras sigue en el logo)
-  logo.addEventListener("mouseenter", () => { if (intro.estado.fin && scrollY < 4) girar(stripLogo, 900); });
 
   if (!reduce) {
     if ("scrollRestoration" in history) history.scrollRestoration = "manual";
@@ -218,7 +213,7 @@
     document.getElementById("saltar").addEventListener("click", e => { e.stopPropagation(); intro.saltar(); });
     addEventListener("wheel", () => intro.saltar(), { passive: true, once: true });
     addEventListener("touchmove", () => intro.saltar(), { passive: true, once: true });
-    (document.fonts?.ready ? Promise.race([document.fonts.ready, pausa(800)]) : Promise.resolve()).then(intro.correr);
+    (document.fonts?.ready ? Promise.race([document.fonts.ready, pausa(500)]) : Promise.resolve()).then(intro.correr);
   }
 
   // ---------- medidas ----------
@@ -228,74 +223,68 @@
   const medirTodo = () => { for (const m of medidores) m(); pedir(); };
   // posición en el documento sin contar transforms (offsetTop no los incluye)
   const topDoc = el => { let y = 0; for (let e = el; e; e = e.offsetParent) y += e.offsetTop; return y; };
+  let vh = innerHeight;   // alto de la pantalla, lo usan todos los efectos de scroll
+  medidores.push(() => { vh = innerHeight; });
 
-  // ---------- inicio: portada → servicios → proyectos ----------
-  // Una sola pantalla fija. Todo se mide en pantallas de scroll (u) desde que la sección llega arriba:
-  // el logo se desvanece y la "a" queda sola; viaja a la derecha y se vuelve una ventana con forma
-  // de "a" que muestra cada servicio; al final la foto ocupa la pantalla y desde ahí entran los proyectos.
+  // ---------- inicio: portada → presentación ----------
+  // Cuando termina la intro, sola (sin scroll): el logo se corre y se achica hasta .logo-destino
+  // y al lado entra la presentación, que queda como pantalla inicial. El avance u va de 0 a FIN.
   const inicio = document.getElementById("inicio");
-  const pin = inicio.querySelector(".inicio-pin");
-  const svgLogo = logo.querySelector(".logo-svg");
-  const ventana = inicio.querySelector(".a-ventana");
-  const tiraA = ventana.querySelector(".a-tira");
-  const destino = inicio.querySelector(".a-destino");
-  const esquinas = inicio.querySelector(".a-esquinas");
-  const servItems = [...inicio.querySelectorAll(".serv-item")];
-  const servTextos = [...inicio.querySelectorAll(".serv-texto")];
-  const servContador = inicio.querySelector(".serv-contador");
-  const vidrioA = vidrio(ventana, 70);
-
-  const T = { letras: [0, .35], viaje: [.25, 1], panel: [.6, 1.2], esquinas: [.85, 1.2], tinta: [1, 1.3], servicios: [1.3, 5.3], salida: [5.3, 6] };
-  const PROY = 6;          // desde acá, un proyecto por pantalla de scroll
+  const destino = inicio.querySelector(".logo-destino");
+  const T = { datos: [0, .4], viaje: [0, .9], panel: [.35, 1.05] };
+  const FIN = 1.05, DURACION = 1200;   // ms de la animación completa
   const tramo = (u, [a, b]) => clamp01((u - a) / (b - a));
-  // la máscara crece desde el asta derecha de la "a" (566, 210 en unidades del logo) hasta cubrir toda la foto
-  const ASTA = { x: (566 - 377) / 228, y: (210 - 64) / 209 }, CRECE = 10;
 
-  // la máscara de la ventana es la misma "a" del logo (bbox 377 64 228 209 en unidades del logo)
-  const svgA = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="377 64 228 209" preserveAspectRatio="none"><path d="${document.getElementById("logo-a").getAttribute("d")}"/></svg>`;
-  ventana.style.setProperty("--mascara", `url("data:image/svg+xml,${encodeURIComponent(svgA)}")`);
-
-  let inicioTop = 0, vh = innerHeight, vw = innerWidth, aLogo, fin;
-  const enPin = el => { const r = el.getBoundingClientRect(), s = pin.getBoundingClientRect(); return { x: r.left - s.left, y: r.top - s.top, w: r.width, h: r.height }; };
+  let desde, hasta, uActual = 0;
+  // posición del logo al centro (sin transform) y del destino, relativas a la pantalla
   medidores.push(() => {
-    inicioTop = topDoc(inicio);
-    vh = innerHeight; vw = pin.clientWidth;
-    const r = enPin(svgLogo), k = r.w / 1256;
-    aLogo = { x: r.x + 377 * k, y: r.y + 64 * k, w: 228 * k, h: 209 * k };
+    const antes = logo.style.transform;
+    logo.style.transform = "none";
+    desde = logo.getBoundingClientRect();
+    logo.style.transform = antes;
     const panelOn = inicio.classList.contains("panel-on");
-    inicio.classList.add("panel-on");           // .a-destino solo se puede medir con el panel visible
-    fin = enPin(destino);
+    inicio.classList.add("panel-on");           // .logo-destino solo se puede medir con el panel visible
+    hasta = destino.getBoundingClientRect();
     inicio.classList.toggle("panel-on", panelOn);
-    const m = Math.max(12, fin.w * .06);
-    Object.assign(esquinas.style, { width: fin.w + m * 2 + "px", height: fin.h + m * 2 + "px" });
-    esquinas.style.setProperty("--ex", fin.x - m + "px");
-    esquinas.style.setProperty("--ey", fin.y - m + "px");
+    if (intro.estado.fin) pintarInicio(uActual);
   });
 
-  let servActivo = -1;
-  function activarServicio(i) {
-    if (i === servActivo) return;
-    const habia = servActivo;
-    servActivo = i;
-    servItems.forEach((b, k) => b.toggleAttribute("aria-current", k === i));
-    servTextos.forEach((t, k) => t.classList.toggle("activo", k === i));
-    servContador.textContent = String(i + 1).padStart(2, "0");
-    // la tira baja hasta el servicio: gira como el rodillo del logo
-    tiraA.style.transform = `translateY(${(i * 100 / servItems.length).toFixed(3)}%)`;
-    if (habia >= 0 && !reduce) {
-      ventana.classList.add("girando");
-      setTimeout(() => ventana.classList.remove("girando"), 480);
-    }
+  function pintarInicio(u) {
+    uActual = u;
+    inicio.classList.toggle("panel-on", u > T.panel[0]);
+    inicio.style.setProperty("--f", tramo(u, T.datos).toFixed(3));
+    inicio.style.setProperty("--panel", easeOut(tramo(u, T.panel)).toFixed(3));
+    const t = easeInOut(tramo(u, T.viaje));
+    const k = lerp(1, hasta.width / desde.width, t);
+    logo.style.transform = u > 0 ? `translate(${lerp(0, hasta.left - desde.left, t).toFixed(1)}px, ${lerp(0, hasta.top - desde.top, t).toFixed(1)}px) scale(${k.toFixed(4)})` : "";
   }
-  activarServicio(0);
 
-  // proyectos: cada capa es una foto a pantalla completa armada con franjas verticales.
+  function presentar() {
+    if (reduce) return pintarInicio(FIN);
+    const t0 = performance.now();
+    const paso = now => {
+      const u = Math.min(FIN, (now - t0) / DURACION * FIN);
+      pintarInicio(u);
+      if (u < FIN) requestAnimationFrame(paso);
+    };
+    requestAnimationFrame(paso);
+  }
+  alTerminarIntro = presentar;
+  // con prefers-reduced-motion la intro ya terminó antes de llegar acá: se muestra el final cuando ya hay medidas
+  if (intro.estado.fin) requestAnimationFrame(() => pintarInicio(FIN));
+  // al pasar el mouse, la "a" del logo vuelve a girar
+  logo.addEventListener("mouseenter", () => { if (intro.estado.fin) girar(stripLogo, 900); });
+
+  // ---------- proyectos ----------
+  // Pantalla fija: cada capa es una foto a pantalla completa armada con franjas verticales.
   // En el cambio, la foto que se va se deshace en canales de vidrio estriado (cada franja amplía y
-  // corre su pedazo) y la nueva aparece desde el vidrio hasta quedar nítida. La primera capa es
-  // un puente: la misma foto con la que terminan los servicios.
+  // corre su pedazo) y la nueva aparece desde el vidrio hasta quedar nítida. El primero ya está abierto.
+  const proy = document.getElementById("proyectos");
+  let proyTop = 0;
+  medidores.push(() => { proyTop = topDoc(proy); });
   const N = innerWidth < 760 ? 8 : 14;
   const ESCALON = .6;
-  const capas = [...inicio.querySelectorAll(".proy-capa")].map((capa, i) => {
+  const capas = [...proy.querySelectorAll(".proy-capa")].map((capa, i) => {
     const foto = capa.querySelector(".proy-foto");
     const img = `url("${capa.dataset.img}")`;
     foto.style.setProperty("--n", N);
@@ -313,7 +302,7 @@
     }
     // orden en que se abren las franjas: izquierda a derecha, derecha a izquierda o desde el centro
     const orden = tiras.map((_, k) => { const x = k / (N - 1); return [x, 1 - x, Math.abs(x - .5) * 2][i % 3]; });
-    return { capa, tiras, orden, puente: capa.classList.contains("puente"), antes: "" };
+    return { capa, tiras, orden, antes: "" };
   });
   const escalon = (w, o) => clamp01(w * (1 + ESCALON) - o * ESCALON);
 
@@ -331,72 +320,25 @@
     if (quieta) return;
     const ordenSale = capas[i + 1]?.orden ?? c.orden;
     c.tiras.forEach((d, k) => {
-      const si = c.puente ? 1 : escalon(entra, c.orden[k]), so = escalon(sale, ordenSale[k]);
+      const si = escalon(entra, c.orden[k]), so = escalon(sale, ordenSale[k]);
       d.style.setProperty("--g", Math.max(1 - si, so).toFixed(3));
       d.style.setProperty("--o", clamp01(si * 2).toFixed(3));
     });
   }
 
   tareas.push(() => {
-    if (!intro.estado.fin) return;
-    const u = Math.max(0, (scrollY - inicioTop) / vh);
-    const salida = easeInOut(tramo(u, T.salida));
-    const enProyectos = u >= PROY;
-    inicio.classList.toggle("a-suelta", u > 0 && !enProyectos);
-    inicio.classList.toggle("panel-on", u > T.panel[0] && salida < 1);
-    inicio.classList.toggle("en-proyectos", enProyectos);
-    inicio.style.setProperty("--f", tramo(u, T.letras).toFixed(3));
-    inicio.style.setProperty("--panel", (easeOut(tramo(u, T.panel)) * (1 - salida)).toFixed(3));
-    inicio.style.setProperty("--tinta", (1 - tramo(u, T.tinta)).toFixed(3));
-    inicio.style.setProperty("--esquinas", (easeOut(tramo(u, T.esquinas)) * (1 - salida)).toFixed(3));
-
-    // servicio actual y cuánto se abrió la "a" para mostrar la foto completa
-    const n = servItems.length;
-    const us = tramo(u, T.servicios) * n;
-    const i = Math.min(n - 1, Math.floor(us)), s = us - i;
-    activarServicio(i);
-    let abre = easeInOut(tramo(s, [.12, .5]));
-    if (i < n - 1) abre *= 1 - easeInOut(tramo(s, [.8, .98]));
-    if (u >= T.salida[0]) abre = 1;
-
-    if (!enProyectos) {
-      // caja de la ventana: de la "a" del logo al destino, y al final a pantalla completa
-      const t = easeInOut(tramo(u, T.viaje));
-      let x = lerp(aLogo.x, fin.x, t), y = lerp(aLogo.y, fin.y, t), w = lerp(aLogo.w, fin.w, t), h = lerp(aLogo.h, fin.h, t);
-      if (salida > 0) {
-        x = lerp(fin.x, 0, salida); y = lerp(fin.y, 0, salida);
-        w = lerp(fin.w, vw, salida); h = lerp(fin.h, vh, salida);
-      }
-      Object.assign(ventana.style, { width: w.toFixed(1) + "px", height: h.toFixed(1) + "px", transform: `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)` });
-
-      // máscara: escala k alrededor del asta; abierta del todo ya no hace falta
-      const k = 1 + (CRECE - 1) * abre;
-      const ax = ASTA.x * w, ay = ASTA.y * h;
-      ventana.classList.toggle("sin-mascara", abre >= 1);
-      ventana.style.setProperty("--ms", `${(w * k).toFixed(1)}px ${(h * k).toFixed(1)}px`);
-      ventana.style.setProperty("--mp", `${(ax * (1 - k)).toFixed(1)}px ${(ay * (1 - k)).toFixed(1)}px`);
-      ventana.style.setProperty("--bo", `${ax.toFixed(1)}px ${ay.toFixed(1)}px`);
-      ventana.style.setProperty("--bk", k.toFixed(3));
-      ventana.style.setProperty("--abre", abre.toFixed(3));
-      vidrioA(Math.sin(t * Math.PI) * .9);   // a mitad del viaje pasa por el vidrio
-    }
-
-    // proyectos: la capa i entra en su pantalla de scroll y se va cuando entra la siguiente
-    const entra = capas.map((c, k) => c.puente ? (enProyectos ? 1 : 0) : tramo(u, [PROY + k - 1 + .1, PROY + k - 1 + .8]));
-    let activa = -1;
+    const u = (scrollY - proyTop) / vh;     // pantallas de scroll desde que la sección llegó arriba
+    if (u < -1.2 || u > capas.length + 1) return;
+    // el primero ya está abierto; cada siguiente entra en su pantalla de scroll
+    const entra = capas.map((c, k) => k === 0 ? 1 : tramo(u, [k - 1 + .1, k - 1 + .8]));
+    let activa = 0;
     capas.forEach((c, k) => {
-      pintarCapa(k, reduce ? Math.round(entra[k]) : entra[k], reduce ? Math.round(entra[k + 1] ?? 0) : (entra[k + 1] ?? 0));
-      if (!c.puente && entra[k] > .7) activa = k;
+      const sale = entra[k + 1] ?? 0;
+      pintarCapa(k, reduce ? Math.round(entra[k]) : entra[k], reduce ? Math.round(sale) : sale);
+      if (entra[k] > .7) activa = k;
     });
     capas.forEach((c, k) => c.capa.classList.toggle("activo", k === activa));
   });
-
-  // tocar un servicio lleva a su tramo de scroll (con la foto abierta)
-  servItems.forEach((b, k) => b.addEventListener("click", () => {
-    const [a, z] = T.servicios;
-    const u = a + (z - a) * (k + .5) / servItems.length;
-    scrollTo({ top: inicioTop + u * vh, behavior: reduce ? "auto" : "smooth" });
-  }));
 
   // ---------- cinta ----------
   const cinta = document.querySelector(".cinta-track");
@@ -469,12 +411,12 @@
     html.classList.add("mov");
     document.querySelectorAll("[data-letras]").forEach(el => partir(el, "letras"));
     document.querySelectorAll("[data-palabras]").forEach(el => partir(el, "palabras"));
-    // fuera de la pantalla fija de inicio, cada bloque entra al aparecer y se reinicia al salir por abajo
+    // fuera de las pantallas fijas (inicio y proyectos), cada bloque entra al aparecer y se reinicia al salir por abajo
     const verMov = new IntersectionObserver(entradas => entradas.forEach(e => {
       if (e.isIntersecting) e.target.classList.add("mov-on");
       else if (e.boundingClientRect.top > 0) e.target.classList.remove("mov-on");
     }), { rootMargin: "0px 0px -4% 0px" });   // poco margen: lo del pie tiene que llegar a activarse
-    document.querySelectorAll("[data-letras], [data-palabras], [data-mov]").forEach(el => { if (!el.closest(".inicio")) verMov.observe(el); });
+    document.querySelectorAll("[data-letras], [data-palabras], [data-mov]").forEach(el => { if (!el.closest(".inicio, .proy")) verMov.observe(el); });
 
     // títulos que derivan de costado según dónde estén en la pantalla
     const derivas = [...document.querySelectorAll("[data-deriva]")].map(el => ({ el, sentido: +el.dataset.deriva, top: 0 }));
