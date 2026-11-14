@@ -186,7 +186,7 @@
       caja.classList.add("foco-on");
       caja.addEventListener("click", saltar);
     }
-    return { correr, saltar, estado };
+    return { correr, saltar, terminar, estado };
   }
 
   // ---------- portada ----------
@@ -206,7 +206,13 @@
     }
   });
 
-  if (!reduce) {
+  // la intro completa se ve una vez por sesión; si ya se vio, se pasa directo a la presentación
+  let introVista = false;
+  try { introVista = sessionStorage.getItem("marta-intro") === "1"; sessionStorage.setItem("marta-intro", "1"); } catch (_) {}
+  if (!reduce && introVista) {
+    intro.terminar();
+    document.getElementById("saltar")?.remove();
+  } else if (!reduce) {
     if ("scrollRestoration" in history) history.scrollRestoration = "manual";
     scrollTo(0, 0);
     html.classList.add("intro-on");
@@ -253,6 +259,7 @@
     uActual = u;
     inicio.classList.toggle("panel-on", u > T.panel[0]);
     inicio.style.setProperty("--f", tramo(u, T.datos).toFixed(3));
+    inicio.classList.toggle("sin-datos", tramo(u, T.datos) * 1.5 >= 1);
     inicio.style.setProperty("--panel", easeOut(tramo(u, T.panel)).toFixed(3));
     const t = easeInOut(tramo(u, T.viaje));
     const k = lerp(1, hasta.width / desde.width, t);
@@ -270,105 +277,195 @@
     requestAnimationFrame(paso);
   }
   alTerminarIntro = presentar;
-  // con prefers-reduced-motion la intro ya terminó antes de llegar acá: se muestra el final cuando ya hay medidas
-  if (intro.estado.fin) requestAnimationFrame(() => pintarInicio(FIN));
+  // si la intro ya terminó antes de llegar acá (movimiento reducido o ya vista en la sesión),
+  // se muestra la presentación cuando ya hay medidas
+  if (intro.estado.fin) requestAnimationFrame(() => reduce ? pintarInicio(FIN) : presentar());
   // al pasar el mouse, la "a" del logo vuelve a girar
   logo.addEventListener("mouseenter", () => { if (intro.estado.fin) girar(stripLogo, 900); });
 
-  // ---------- proyectos ----------
-  // Pantalla fija: cada capa es una foto a pantalla completa armada con franjas verticales.
-  // En el cambio, la foto que se va se deshace en canales de vidrio estriado (cada franja amplía y
-  // corre su pedazo) y la nueva aparece desde el vidrio hasta quedar nítida. El primero ya está abierto.
-  const proy = document.getElementById("proyectos");
-  let proyTop = 0;
-  medidores.push(() => { proyTop = topDoc(proy); });
-  const N = innerWidth < 760 ? 8 : 14;
-  const ESCALON = .6;
-  const capas = [...proy.querySelectorAll(".proy-capa")].map((capa, i) => {
-    const foto = capa.querySelector(".proy-foto");
-    const img = `url("${capa.dataset.img}")`;
-    foto.style.setProperty("--n", N);
-    foto.style.backgroundImage = img;
-    const tiras = [];
-    for (let k = 0; k < N; k++) {
-      const d = document.createElement("div");
-      d.className = "pv";
-      d.style.setProperty("--j", k);
-      const pedazo = document.createElement("i");
-      pedazo.style.backgroundImage = img;
-      d.append(pedazo);
-      foto.append(d);
-      tiras.push(d);
+  // ---------- portfolio ----------
+  // Carrusel circular en 3D. Las piezas salen de "trabajos" (carpetas en portfolio/<id>/:
+  // mini/N.jpg para el carrusel, fotos/N.jpg y videos/N.mp4 + N.jpg para el visor).
+  // Gira solo, se puede arrastrar, se acelera con el scroll y al tocar una pieza abre el visor.
+  const trabajos = [
+    { id: "pasteleria", nombre: "Pastelería", fotos: 8, videos: 6 },
+    { id: "pizzeria", nombre: "Pizzería", fotos: 3, videos: 3 },
+    { id: "patagonia", nombre: "Patagonia", fotos: 3, videos: 3 },
+    { id: "estetica", nombre: "Estética", fotos: 3, videos: 3 },
+    { id: "farmacia", nombre: "Farmacia", fotos: 2, videos: 2 },
+    { id: "focacceria", nombre: "Focaccería", fotos: 1, videos: 1 },
+    { id: "perfumeria", nombre: "Perfumería", fotos: 1, videos: 1 },
+    { id: "gym", nombre: "Gym", fotos: 1, videos: 1 },
+    { id: "eventos", nombre: "Eventos", fotos: 1, videos: 1 },
+    { id: "siglo21", nombre: "Siglo 21", fotos: 1, videos: 1 },
+  ];
+  const rutaMarca = t => `portfolio/${t.id}`;
+
+  // piezas del carrusel: primero una foto de cada marca, después un video de cada una y después
+  // una segunda foto de las que tienen más; así las piezas de una misma marca no quedan juntas
+  const piezas = [
+    ...trabajos.map(t => ({ t, img: `${rutaMarca(t)}/mini/1.jpg`, video: false })),
+    ...trabajos.filter(t => t.videos).map(t => ({ t, img: `${rutaMarca(t)}/mini/v1.jpg`, video: true })),
+    ...trabajos.filter(t => t.fotos > 1).map(t => ({ t, img: `${rutaMarca(t)}/mini/2.jpg`, video: false })),
+  ];
+  const carrusel = document.getElementById("carrusel");
+  const anillo = document.getElementById("anillo");
+  const PASO = 360 / piezas.length;
+  piezas.forEach((pz, i) => {
+    const li = document.createElement("li");
+    li.className = "pieza" + (pz.video ? " video" : "");
+    const b = document.createElement("button");
+    b.type = "button";
+    b.tabIndex = i === 0 ? 0 : -1;               // solo la pieza de adelante recibe el foco (ver "teclado")
+    b.dataset.img = pz.img;                      // la imagen se carga cuando el carrusel se acerca (abajo)
+    b.setAttribute("aria-label", `Ver trabajos de ${pz.t.nombre}`);
+    b.innerHTML = `<span class="marca" aria-hidden="true">${pz.t.nombre}</span>`;
+    b.addEventListener("click", () => { if (!arrastro) abrirTrabajos(pz.t); });
+    b.addEventListener("focus", () => { objetivo = cercano(-i * PASO); });
+    li.append(b);
+    anillo.append(li);
+  });
+
+  // las imágenes se piden recién cuando el carrusel está por aparecer
+  const cargarPiezas = new IntersectionObserver(([e]) => {
+    if (!e.isIntersecting) return;
+    cargarPiezas.disconnect();
+    anillo.querySelectorAll("button[data-img]").forEach(b => { b.style.backgroundImage = `url("${b.dataset.img}")`; });
+  }, { rootMargin: "800px 0px" });
+  cargarPiezas.observe(carrusel);
+
+  // el radio sale del ancho de las piezas, para que queden pegadas pero sin encimarse
+  const elPiezas = [...anillo.children];
+  const botones = elPiezas.map(li => li.firstChild);
+  let frente = 0;
+  let radio = 600;
+  const INCLINA = .11;   // cuánto bajan las de adelante y suben las de atrás (fracción del radio)
+  medidores.push(() => {
+    const ancho = elPiezas[0].offsetWidth, alto = elPiezas[0].offsetHeight;
+    radio = (ancho + 16) * piezas.length / (2 * Math.PI);
+    // la de atrás queda más arriba y más chica (k = 4/5), la de adelante más abajo y más grande (k = 4/3)
+    const arriba = (radio * INCLINA + alto / 2) * 4 / 5, abajo = (radio * INCLINA + alto / 2) * 4 / 3;
+    carrusel.style.height = `${Math.round(arriba + abajo + 40)}px`;
+    carrusel.style.setProperty("--centro", `${Math.round(arriba + 20)}px`);
+    pintarAnillo();
+  });
+
+  // ubica cada pieza en el círculo. La cámara está a 4 radios: las de adelante se ven apenas
+  // más grandes y más abajo, las de atrás más chicas, más arriba y espejadas (como en el ejemplo).
+  function pintarAnillo() {
+    const camara = radio * 4;
+    let masCerca = -Infinity, nuevoFrente = frente;
+    elPiezas.forEach((el, i) => {
+      const a = (giro + i * PASO) * Math.PI / 180;
+      const x = radio * Math.sin(a), z = radio * Math.cos(a);
+      const k = camara / (camara - z);
+      const y = z * INCLINA;
+      // el giro de cada pieza es un scaleX plano (cos del ángulo; negativo = espejada atrás) y no un
+      // rotateY: con transformaciones 3D Safari ordena las piezas por su cuenta e ignora el z-index
+      el.style.transform = `translate(${(x * k).toFixed(1)}px, ${(y * k).toFixed(1)}px) scale(${k.toFixed(3)}) scaleX(${Math.cos(a).toFixed(3)})`;
+      el.style.zIndex = Math.round(z + radio * 2);
+      el.style.opacity = z < 0 ? .8 : 1;
+      if (z > masCerca) { masCerca = z; nuevoFrente = i; }
+    });
+    // teclado: el Tab entra solo por la pieza de adelante (no por las 25)
+    if (nuevoFrente !== frente) {
+      botones[frente].tabIndex = -1;
+      botones[nuevoFrente].tabIndex = 0;
+      frente = nuevoFrente;
     }
-    // orden en que se abren las franjas: izquierda a derecha, derecha a izquierda o desde el centro
-    const orden = tiras.map((_, k) => { const x = k / (N - 1); return [x, 1 - x, Math.abs(x - .5) * 2][i % 3]; });
-    return { capa, tiras, orden, antes: "" };
-  });
-  const escalon = (w, o) => clamp01(w * (1 + ESCALON) - o * ESCALON);
-
-  function pintarCapa(i, entra, sale) {
-    const c = capas[i];
-    const clave = entra.toFixed(3) + "|" + sale.toFixed(3);
-    if (clave === c.antes) return;
-    c.antes = clave;
-    const visible = entra > 0 && sale < 1;
-    c.capa.classList.toggle("visible", visible);
-    if (!visible) return;
-    const quieta = entra >= 1 && sale <= 0;
-    c.capa.classList.toggle("abierta", quieta);
-    c.capa.style.setProperty("--s-capa", entra.toFixed(3));
-    if (quieta) return;
-    const ordenSale = capas[i + 1]?.orden ?? c.orden;
-    c.tiras.forEach((d, k) => {
-      const si = escalon(entra, c.orden[k]), so = escalon(sale, ordenSale[k]);
-      d.style.setProperty("--g", Math.max(1 - si, so).toFixed(3));
-      d.style.setProperty("--o", clamp01(si * 2).toFixed(3));
-    });
   }
+  let giro = 0, extra = 0, objetivo = null, arrastre = null, arrastro = false, corriendo = false, tAntes = 0;
+  // se frena con el botón de pausa, con el mouse encima o con el foco adentro (pauta: todo lo que se mueve solo se tiene que poder frenar)
+  let pausado = false, encima = false, conFoco = false;
+  const BASE = reduce ? 0 : 8;                       // grados por segundo
+  const cercano = g => giro + ((((g - giro) % 360) + 540) % 360 - 180);   // mismo ángulo por el camino más corto
+  function cuadro(t) {
+    const dt = Math.min(.05, (t - tAntes) / 1000);
+    tAntes = t;
+    if (objetivo !== null) {
+      giro += (objetivo - giro) * Math.min(1, dt * 6);
+      if (Math.abs(objetivo - giro) < .05) objetivo = null;
+    } else if (!arrastre) {
+      giro += ((pausado || encima || conFoco ? 0 : BASE) + extra) * dt;
+    }
+    extra *= Math.pow(.08, dt);                       // el impulso se apaga en un par de segundos
+    pintarAnillo();
+    if (corriendo) requestAnimationFrame(cuadro);
+  }
+  // solo gira mientras está en pantalla
+  new IntersectionObserver(([e]) => {
+    corriendo = e.isIntersecting;
+    if (corriendo) requestAnimationFrame(t => { tAntes = t; cuadro(t); });
+  }).observe(carrusel);
 
-  tareas.push(() => {
-    const u = (scrollY - proyTop) / vh;     // pantallas de scroll desde que la sección llegó arriba
-    if (u < -1.2 || u > capas.length + 1) return;
-    // el primero ya está abierto; cada siguiente entra en su pantalla de scroll
-    const entra = capas.map((c, k) => k === 0 ? 1 : tramo(u, [k - 1 + .1, k - 1 + .8]));
-    let activa = 0;
-    capas.forEach((c, k) => {
-      const sale = entra[k + 1] ?? 0;
-      pintarCapa(k, reduce ? Math.round(entra[k]) : entra[k], reduce ? Math.round(sale) : sale);
-      if (entra[k] > .7) activa = k;
-    });
-    capas.forEach((c, k) => c.capa.classList.toggle("activo", k === activa));
+  // arrastrar para girar; si se arrastró, el clic no abre la pieza
+  carrusel.addEventListener("pointerdown", e => {
+    arrastre = { x: e.clientX, giro, t: performance.now(), v: 0 };
+    arrastro = false; objetivo = null;
   });
-
-  // ---------- cinta ----------
-  const cinta = document.querySelector(".cinta-track");
-  let mitadCinta = 1;
-  medidores.push(() => { mitadCinta = cinta.scrollWidth / 2 || 1; });
-  let yCinta = scrollY, quietaCinta;
+  addEventListener("pointermove", e => {
+    if (!arrastre) return;
+    const dx = e.clientX - arrastre.x;
+    if (Math.abs(dx) > 6 && !arrastro) { arrastro = true; carrusel.classList.add("arrastrando"); }
+    const nuevo = arrastre.giro + dx * .25, ahora = performance.now();
+    arrastre.v = (nuevo - giro) / Math.max(1, ahora - arrastre.t) * 1000;
+    arrastre.t = ahora;
+    giro = nuevo;
+  });
+  addEventListener("pointerup", () => {
+    if (!arrastre) return;
+    if (arrastro && !reduce) extra = Math.max(-240, Math.min(240, arrastre.v)) - BASE;
+    arrastre = null;
+    carrusel.classList.remove("arrastrando");
+    setTimeout(() => { arrastro = false; }, 0);
+  });
+  carrusel.addEventListener("pointerenter", e => { if (e.pointerType === "mouse") encima = true; });
+  carrusel.addEventListener("pointerleave", () => { encima = false; });
+  carrusel.addEventListener("focusin", () => { conFoco = true; });
+  carrusel.addEventListener("focusout", () => { conFoco = false; });
+  const botonPausa = document.getElementById("pausa");
+  botonPausa.hidden = reduce;                         // con movimiento reducido ya está quieto
+  botonPausa.addEventListener("click", () => {
+    pausado = !pausado;
+    botonPausa.setAttribute("aria-pressed", pausado);
+    botonPausa.textContent = pausado ? "Seguir" : "Pausar";
+  });
+  // teclado: las flechas pasan a la marca de al lado y le dan el foco
+  carrusel.addEventListener("keydown", e => {
+    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+    e.preventDefault();
+    const n = botones.length, i = (frente + (e.key === "ArrowRight" ? 1 : -1) + n) % n;
+    botones[i].focus({ preventScroll: true });
+  });
+  // flechas: una pieza por vez
+  document.querySelectorAll(".girar").forEach(b => b.addEventListener("click", () => {
+    objetivo = (objetivo ?? giro) - +b.dataset.sentido * PASO;
+    if (reduce) { giro = objetivo; objetivo = null; pintarAnillo(); }
+  }));
+  // el scroll le da un empujón
+  let yCarrusel = scrollY;
   if (!reduce) tareas.push(() => {
-    cinta.style.transform = `translate3d(${(-(scrollY * .35) % mitadCinta).toFixed(1)}px, 0, 0)`;
-    // se inclina según la velocidad del scroll
-    const v = scrollY - yCinta;
-    yCinta = scrollY;
-    cinta.style.setProperty("--sesgo", `${Math.max(-14, Math.min(14, -v * .25)).toFixed(1)}deg`);
-    clearTimeout(quietaCinta);
-    quietaCinta = setTimeout(() => cinta.style.setProperty("--sesgo", "0deg"), 120);
+    if (corriendo) extra = Math.max(-200, Math.min(200, extra + (scrollY - yCarrusel) * .6));
+    yCarrusel = scrollY;
   });
 
-  // ---------- equipo ----------
-  // cada retrato se enfoca al llegar al centro de la pantalla; las columnas se mueven a distinto ritmo
-  const personas = [...document.querySelectorAll(".persona")].map((el, k) => ({ el, k, v: vidrio(el.querySelector(".retrato"), 40), top: 0, alto: 0 }));
-  medidores.push(() => personas.forEach(p => { p.top = topDoc(p.el); p.alto = p.el.offsetHeight; }));
-  tareas.push(() => {
-    const rango = innerWidth < 860 ? .25 : 1;   // en dos columnas casi no se desfasan
-    personas.forEach(({ el, k, v, top, alto }) => {
-      const r = top - scrollY;
-      if (r + alto < -200 || r > vh + 200) return;
-      const c = (r + alto / 2 - vh / 2) / vh;
-      v(Math.abs(c) * 2 - .25);
-      if (!reduce) el.style.setProperty("--py", `${(c * (k % 2 ? -60 : 30) * rango).toFixed(1)}px`);
-    });
-  });
+  // visor: todos los videos y fotos de una marca
+  const visorTrab = document.getElementById("trabajos");
+  const grillaTrab = document.getElementById("trabGrilla");
+  function abrirTrabajos(t) {
+    document.getElementById("trab-titulo").textContent = t.nombre.toLowerCase();
+    const r = rutaMarca(t);
+    const videos = Array.from({ length: t.videos }, (_, k) =>
+      `<video src="${r}/videos/${k + 1}.mp4" poster="${r}/videos/${k + 1}.jpg" controls playsinline preload="metadata"></video>`);
+    const fotos = Array.from({ length: t.fotos }, (_, k) =>
+      `<img src="${r}/fotos/${k + 1}.jpg" alt="${t.nombre}, foto ${k + 1}" loading="lazy">`);
+    grillaTrab.innerHTML = [...videos, ...fotos].join("");
+    visorTrab.showModal();
+  }
+  document.getElementById("trabCerrar").addEventListener("click", () => visorTrab.close());
+  visorTrab.addEventListener("click", e => { if (e.target === visorTrab) visorTrab.close(); });
+  // al cerrar se vacía, así se cortan los videos y las descargas
+  visorTrab.addEventListener("close", () => { grillaTrab.innerHTML = ""; });
 
   // ---------- movimiento de textos ----------
   // [data-letras] entra letra por letra y [data-palabras] palabra por palabra (ver styles.css).
@@ -411,12 +508,12 @@
     html.classList.add("mov");
     document.querySelectorAll("[data-letras]").forEach(el => partir(el, "letras"));
     document.querySelectorAll("[data-palabras]").forEach(el => partir(el, "palabras"));
-    // fuera de las pantallas fijas (inicio y proyectos), cada bloque entra al aparecer y se reinicia al salir por abajo
+    // fuera del inicio, cada bloque entra al aparecer y se reinicia al salir por abajo
     const verMov = new IntersectionObserver(entradas => entradas.forEach(e => {
       if (e.isIntersecting) e.target.classList.add("mov-on");
       else if (e.boundingClientRect.top > 0) e.target.classList.remove("mov-on");
     }), { rootMargin: "0px 0px -4% 0px" });   // poco margen: lo del pie tiene que llegar a activarse
-    document.querySelectorAll("[data-letras], [data-palabras], [data-mov]").forEach(el => { if (!el.closest(".inicio, .proy")) verMov.observe(el); });
+    document.querySelectorAll("[data-letras], [data-palabras], [data-mov]").forEach(el => { if (!el.closest(".inicio")) verMov.observe(el); });
 
     // títulos que derivan de costado según dónde estén en la pantalla
     const derivas = [...document.querySelectorAll("[data-deriva]")].map(el => ({ el, sentido: +el.dataset.deriva, top: 0 }));
@@ -461,7 +558,7 @@
   });
   navLinks.forEach(a => a.addEventListener("click", cerrarMenu));
 
-  // ---------- contacto: copiar email y formulario ----------
+  // ---------- contacto: copiar email ----------
   const copiar = document.getElementById("copiar"), mail = document.getElementById("mail");
   const seleccionar = () => getSelection().selectAllChildren(mail);
   copiar.addEventListener("click", () => {
@@ -471,16 +568,6 @@
         setTimeout(() => copiar.textContent = "Copiar", 1800);
       }, seleccionar);
     } catch (_) { seleccionar(); }
-  });
-
-  // todavía no está conectado a ningún servicio de envío
-  document.getElementById("form").addEventListener("submit", e => {
-    e.preventDefault();
-    const aviso = document.getElementById("aviso");
-    const nombre = document.getElementById("f-nombre"), email = document.getElementById("f-email");
-    if (!nombre.value.trim()) { aviso.textContent = "Escribí tu nombre para que sepamos a quién responder."; nombre.focus(); return; }
-    if (!email.value || !email.checkValidity()) { aviso.textContent = "Revisá el email: necesitamos uno válido para responderte."; email.focus(); return; }
-    aviso.textContent = "El formulario todavía no está conectado, así que la consulta no se envió.";
   });
 
   document.getElementById("anio").textContent = new Date().getFullYear();

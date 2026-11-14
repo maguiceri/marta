@@ -3,9 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Marta Agencia Web</title>
+<title>marta · marketing digital</title>
 <meta name="description" content="marta marketing digital: las ideas sin estrategia son puro humo. Social media, branding y diseño, y publicidad en Meta Ads.">
 <link rel="icon" href="img/a.svg" type="image/svg+xml">
+<!-- vista previa al compartir el link (WhatsApp, Instagram, LinkedIn). og:image debería ser una URL completa cuando haya dominio -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="marta · marketing digital">
+<meta property="og:description" content="Las ideas sin estrategia son puro humo. Acá preferimos que pasen cosas. Social media, branding y diseño, y publicidad en Meta Ads.">
+<meta property="og:image" content="img/compartir.jpg">
+<meta property="og:locale" content="es_AR">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Special+Gothic+Expanded+One&family=Geist:wght@400;500;700;900&display=swap">
@@ -34,9 +41,9 @@
     </a>
     <nav class="nav" id="nav" aria-label="Principal">
       <a href="#servicios">Servicios</a>
-      <a href="#proyectos">Proyectos</a>
-      <a href="#equipo">Equipo</a>
-      <a class="btn" href="#contacto">Pedir propuesta</a>
+      <a href="#portfolio">Portfolio</a>
+      <a href="#sobre">Sobre Marta</a>
+      <a class="btn" href="#contacto">Hablemos</a>
     </nav>
     <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="nav">Menú</button>
   </div>
@@ -60,10 +67,9 @@
             </svg>
           </svg>
         </h1>
-        <span class="dato d1">Agencia de marketing digital</span>
         <span class="dato d2">Buenos Aires</span>
         <span class="dato d3">Social media · Branding · Meta Ads</span>
-        <span class="dato d4">Scroll</span>
+        <span class="dato d4" aria-hidden="true">Scroll</span>
       </div>
       <div class="foco-blur" aria-hidden="true"></div>
       <div class="visor" aria-hidden="true"><span class="esq tl"></span><span class="esq tr"></span><span class="esq bl"></span><span class="esq br"></span></div>
@@ -72,7 +78,6 @@
 
     <div class="presenta">
       <div class="presenta-texto">
-        <span class="kicker" data-mov="izq">marta · marketing digital</span>
         <h2 class="presenta-titulo"><span data-letras>las ideas sin estrategia son puro humo.</span> <span class="presenta-cosas" data-letras>acá preferimos que pasen cosas<span class="guion">_</span></span></h2>
         <p class="presenta-bajada" data-palabras>Construimos marcas con pensamiento estratégico, creatividad y acciones que responden a un objetivo.</p>
         <a class="btn btn-grande" href="#contacto" data-mov="abajo" style="--d: .35s">Quiero estrategia, no humo <span class="flecha" aria-hidden="true">↗</span></a>
@@ -110,132 +115,88 @@
   </div>
 </section>
 
-<!-- Proyectos: pantalla fija; cada proyecto entra a través del vidrio estriado (franjas que arma main.js) -->
-<section class="proy" id="proyectos" aria-labelledby="proy-titulo">
-  <div class="proy-pin">
-    <h2 class="sr" id="proy-titulo">Proyectos</h2>
-    <article class="proy-capa tinta-naranja" data-img="img/ejemplos/proy-1.jpg">
-      <div class="proy-foto" aria-hidden="true"></div>
-      <div class="proy-info">
-        <span class="kicker" data-mov="izq"><span>Proyectos · <b>01</b> / 06</span></span>
-        <h3 class="proy-titulo" data-letras>línea naranja<span class="guion">_</span></h3>
-        <span class="proy-reflejo" aria-hidden="true" data-mov="abajo" style="--d: .35s">línea naranja_</span>
-        <p class="proy-datos" data-mov="der" style="--d: .4s"><span>Cafetería de especialidad</span><span>Branding y diseño · Social media</span><span>2026</span></p>
-      </div>
-    </article>
-    <article class="proy-capa" data-img="img/ejemplos/proy-2.jpg">
-      <div class="proy-foto" aria-hidden="true"></div>
-      <div class="proy-info">
-        <span class="kicker" data-mov="izq"><span>Proyectos · <b>02</b> / 06</span></span>
-        <h3 class="proy-titulo" data-letras>quieto<span class="guion">_</span></h3>
-        <span class="proy-reflejo" aria-hidden="true" data-mov="abajo" style="--d: .35s">quieto_</span>
-        <p class="proy-datos" data-mov="der" style="--d: .4s"><span>Estudio de yoga</span><span>Social media</span><span>2025</span></p>
-      </div>
-    </article>
-    <article class="proy-capa tinta-naranja" data-img="img/ejemplos/proy-3.jpg">
-      <div class="proy-foto" aria-hidden="true"></div>
-      <div class="proy-info">
-        <span class="kicker" data-mov="izq"><span>Proyectos · <b>03</b> / 06</span></span>
-        <h3 class="proy-titulo" data-letras>nocturna<span class="guion">_</span></h3>
-        <span class="proy-reflejo" aria-hidden="true" data-mov="abajo" style="--d: .35s">nocturna_</span>
-        <p class="proy-datos" data-mov="der" style="--d: .4s"><span>Bar y espacio cultural</span><span>Meta Ads · Social media</span><span>2025</span></p>
-      </div>
-    </article>
-    <article class="proy-capa" data-img="img/ejemplos/proy-4.jpg">
-      <div class="proy-foto" aria-hidden="true"></div>
-      <div class="proy-info">
-        <span class="kicker" data-mov="izq"><span>Proyectos · <b>04</b> / 06</span></span>
-        <h3 class="proy-titulo" data-letras>a través<span class="guion">_</span></h3>
-        <span class="proy-reflejo" aria-hidden="true" data-mov="abajo" style="--d: .35s">a través_</span>
-        <p class="proy-datos" data-mov="der" style="--d: .4s"><span>Marca de iluminación</span><span>Branding y diseño</span><span>2026</span></p>
-      </div>
-    </article>
-    <article class="proy-capa" data-img="img/ejemplos/proy-5.jpg">
-      <div class="proy-foto" aria-hidden="true"></div>
-      <div class="proy-info">
-        <span class="kicker" data-mov="izq"><span>Proyectos · <b>05</b> / 06</span></span>
-        <h3 class="proy-titulo" data-letras>siesta<span class="guion">_</span></h3>
-        <span class="proy-reflejo" aria-hidden="true" data-mov="abajo" style="--d: .35s">siesta_</span>
-        <p class="proy-datos" data-mov="der" style="--d: .4s"><span>Tienda de muebles</span><span>Social media · Meta Ads</span><span>2024</span></p>
-      </div>
-    </article>
-    <article class="proy-capa tinta-naranja" data-img="img/ejemplos/proy-6.jpg">
-      <div class="proy-foto" aria-hidden="true"></div>
-      <div class="proy-info">
-        <span class="kicker" data-mov="izq"><span>Proyectos · <b>06</b> / 06</span></span>
-        <h3 class="proy-titulo" data-letras>reflejo<span class="guion">_</span></h3>
-        <span class="proy-reflejo" aria-hidden="true" data-mov="abajo" style="--d: .35s">reflejo_</span>
-        <p class="proy-datos" data-mov="der" style="--d: .4s"><span>Consultora de bienestar</span><span>Branding y diseño</span><span>2024</span></p>
-      </div>
-    </article>
+<!-- Portfolio: carrusel circular en 3D con piezas de cada marca (lo arma main.js con "trabajos");
+     al tocar una pieza se abre el visor con todos los videos y fotos de esa marca -->
+<section class="portfolio" id="portfolio" aria-labelledby="port-titulo">
+  <div class="ancho port-cabeza">
+    <span class="kicker" data-mov="izq">Portfolio</span>
+    <h2 class="port-titulo" id="port-titulo" data-letras>si vamos a hablar de criterio, mejor mostrarlo<span class="guion">_</span></h2>
+    <p class="port-ayuda" data-mov="der">Tocá cualquier pieza para ver todo lo que hicimos con esa marca.</p>
   </div>
+  <div class="carrusel" id="carrusel" role="region" aria-roledescription="carrusel" aria-label="Trabajos por marca" aria-describedby="carrusel-ayuda">
+    <p class="sr" id="carrusel-ayuda">Con las flechas del teclado se pasa de una marca a otra; Enter abre sus trabajos.</p>
+    <ul class="anillo" id="anillo"></ul>
+  </div>
+  <div class="carrusel-ctrl">
+    <button class="girar" type="button" data-sentido="-1" aria-label="Girar a la izquierda">←</button>
+    <button class="pausa" id="pausa" type="button" aria-pressed="false">Pausar</button>
+    <button class="girar" type="button" data-sentido="1" aria-label="Girar a la derecha">→</button>
+  </div>
+
+  <dialog class="trabajos" id="trabajos" aria-labelledby="trab-titulo">
+    <div class="trab-cabeza">
+      <h3 class="trab-titulo" id="trab-titulo"></h3>
+      <button class="trab-cerrar" id="trabCerrar" type="button" aria-label="Cerrar">×</button>
+    </div>
+    <div class="trab-grilla" id="trabGrilla"></div>
+  </dialog>
 </section>
 
-  </div>
-</section>
-
-<div class="cinta" aria-hidden="true">
-  <div class="cinta-track">
-    <span>reflejo</span><span>a través de</span><span>ambientes y personas</span><span>movimiento y acción</span>
-    <span>reflejo</span><span>a través de</span><span>ambientes y personas</span><span>movimiento y acción</span>
-  </div>
-</div>
-
-<section class="equipo" id="equipo" aria-labelledby="eq-titulo">
+<!-- Sobre Marta -->
+<section class="sobre" id="sobre" aria-labelledby="sobre-titulo">
   <div class="ancho">
-    <div class="cabeza">
-      <div>
-        <span class="kicker" data-mov="izq">Equipo</span>
-        <h2 class="titulo" id="eq-titulo" data-letras data-deriva="-1">quiénes somos<span class="guion">_</span></h2>
+    <span class="kicker" data-mov="izq">Sobre Marta</span>
+    <h2 class="sobre-titulo" id="sobre-titulo" data-letras>tenemos criterio. y eso no se improvisa<span class="guion">_</span></h2>
+    <p class="sobre-lead" data-palabras>En Marta no nos casamos con las fórmulas, los formatos. Nos interesa entender, incomodar un poquito cuando hace falta y encontrar caminos propios para cada marca.</p>
+    <p class="pasos">
+      <span data-mov="izq">Primero entendemos.</span>
+      <span data-mov="der" style="--d: .1s">Después pensamos.</span>
+      <span data-mov="izq" style="--d: .2s">Y recién ahí, hacemos<span class="guion">_</span></span>
+    </p>
+    <p class="sobre-cierre" data-palabras>Porque tener ideas está buenísimo pero tener criterio para elegir cuáles llevar adelante es otra historia.</p>
+
+    <div class="belen">
+      <figure class="belen-foto" data-mov="izq">
+        <img src="img/belen.jpg" alt="Belén, directora de Marta, sonriendo frente a un micrófono" width="960" height="1200" loading="lazy">
+      </figure>
+      <div class="belen-texto">
+        <h3 class="sub-titulo" data-letras>¿quiénes estamos detrás de todo esto?</h3>
+        <p data-palabras>Soy Belén, se podría decir que soy la directora de la orquesta y hoy estoy al frente de un equipo con el que pensamos, creamos y llevamos adelante proyectos de marketing y comunicación.</p>
+        <p data-palabras>Marta nació de las ganas de combinar estrategia y creatividad, de involucrarme en los proyectos y de no conformarme con hacer lo que se supone que hay que hacer.</p>
+        <p data-palabras>Hoy trabajamos con marcas muy distintas, desde lugares distintos, pero con algo en común: nos gusta meternos de verdad en cada proyecto. Entender sus desafíos, encontrar oportunidades y construir una forma propia de comunicar.</p>
       </div>
-      <p data-palabras>Un equipo chico y cercano. Hablás directamente con quien diseña tu proyecto.</p>
     </div>
-    <div class="personas">
-      <article class="persona"><div class="retrato vidrio" aria-hidden="true"><div class="lente"></div></div><h3 data-mov="izq">Nombre Apellido</h3><p data-mov="der" style="--d: .12s">Dirección creativa</p></article>
-      <article class="persona"><div class="retrato vidrio" aria-hidden="true"><div class="lente"></div></div><h3 data-mov="izq">Nombre Apellido</h3><p data-mov="der" style="--d: .12s">Diseño gráfico y branding</p></article>
-      <article class="persona"><div class="retrato vidrio" aria-hidden="true"><div class="lente"></div></div><h3 data-mov="izq">Nombre Apellido</h3><p data-mov="der" style="--d: .12s">Contenido y redes</p></article>
-      <article class="persona"><div class="retrato vidrio" aria-hidden="true"><div class="lente"></div></div><h3 data-mov="izq">Nombre Apellido</h3><p data-mov="der" style="--d: .12s">Fotografía y video</p></article>
+
+    <div class="primera-idea">
+      <h3 class="sub-titulo grande" data-letras>no nos casamos con la primera idea<span class="guion">_</span></h3>
+      <div class="primera-texto">
+        <p data-palabras>No tenemos todas las respuestas. Pero sabemos hacer las preguntas correctas, detectar cuando algo no funciona y buscarle otra vuelta.</p>
+        <p data-palabras>Y si una idea no tiene sentido, no la hacemos solamente porque sí. Para nosotras, de eso también se trata hacer buen marketing.</p>
+        <a class="btn btn-grande" href="#contacto" data-mov="izq" style="--d: .2s">Vamos a ponernos cara <span class="flecha" aria-hidden="true">↗</span></a>
+      </div>
     </div>
   </div>
 </section>
 
+<!-- Contacto: fondo gris del manual, texto crema -->
 <section class="contacto" id="contacto" aria-labelledby="ct-titulo">
   <div class="ancho">
     <span class="kicker" data-mov="izq">Contacto</span>
-    <h2 class="hablemos" id="ct-titulo" data-letras data-deriva="1">hablemos<span class="guion">_</span></h2>
-    <div class="contacto-grid">
-      <div class="datos">
-        <p data-palabras>Contanos qué necesitás y te respondemos en 48 horas hábiles con los próximos pasos.</p>
-        <div class="dato-c" data-mov="izq" style="--d: 0.10s"><span class="etiqueta">Email</span><span class="val" id="mail">hola@marta.agency</span><button class="copiar" id="copiar" type="button">Copiar</button></div>
-        <div class="dato-c" data-mov="izq" style="--d: 0.18s"><span class="etiqueta">Instagram</span><span class="val">@marta.agencia</span></div>
-        <div class="dato-c" data-mov="izq" style="--d: 0.26s"><span class="etiqueta">Estudio</span><span class="val">Buenos Aires · trabajamos en remoto</span></div>
-      </div>
-      <form id="form" novalidate>
-        <div data-mov="der" style="--d: 0.05s" class="campo"><label for="f-nombre">Nombre</label><input id="f-nombre" name="nombre" autocomplete="name" required placeholder="Tu nombre"></div>
-        <div data-mov="der" style="--d: 0.12s" class="campo"><label for="f-empresa">Marca o empresa</label><input id="f-empresa" name="empresa" autocomplete="organization" placeholder="Opcional"></div>
-        <div data-mov="der" style="--d: 0.19s" class="campo full"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email" required placeholder="nombre@empresa.com"></div>
-        <fieldset data-mov="der" style="--d: .26s">
-          <legend>Qué necesitás</legend>
-          <div class="opciones">
-            <input type="checkbox" id="o1" name="servicio" value="social-media"><label for="o1">Social media</label>
-            <input type="checkbox" id="o2" name="servicio" value="branding"><label for="o2">Branding y diseño</label>
-            <input type="checkbox" id="o3" name="servicio" value="meta-ads"><label for="o3">Publicidad en Meta Ads</label>
-            <input type="checkbox" id="o5" name="servicio" value="nose"><label for="o5">Todavía no sé</label>
-          </div>
-        </fieldset>
-        <div data-mov="der" style="--d: .33s" class="campo full"><label for="f-msg">Contanos sobre el proyecto</label><textarea id="f-msg" name="mensaje" placeholder="Qué querés lograr, para cuándo y cualquier referencia que tengas"></textarea></div>
-        <div class="enviar" data-mov="abajo" style="--d: .4s">
-          <button class="btn" type="submit">Enviar consulta →</button>
-          <span class="aviso" id="aviso" role="status"></span>
-        </div>
-      </form>
-    </div>
+    <h2 class="ct-titulo" id="ct-titulo" data-letras>¿y si hacemos que algo pase?</h2>
+    <p class="ct-bajada" data-palabras>Contanos qué tenés entre manos, qué querés lograr y dónde estás hoy. Nosotras te ayudamos a encontrar qué necesita tu marca y armamos una propuesta a medida.</p>
+    <a class="btn btn-grande btn-wa" href="https://wa.me/5491137645547?text=Hola%20Marta%2C%20les%20quiero%20contar%20sobre%20mi%20marca." target="_blank" rel="noopener" data-mov="izq">Escribinos por WhatsApp <span class="flecha" aria-hidden="true">↗</span></a>
+    <ul class="canales">
+      <li data-mov="izq"><span class="etiqueta">WhatsApp</span><a href="https://wa.me/5491137645547?text=Hola%20Marta%2C%20les%20quiero%20contar%20sobre%20mi%20marca." target="_blank" rel="noopener">11 3764-5547</a></li>
+      <li data-mov="izq" style="--d: .08s"><span class="etiqueta">Email</span><a href="mailto:heymarta.socialmedia@gmail.com" id="mail">heymarta.socialmedia@gmail.com</a><button class="copiar" id="copiar" type="button">Copiar</button></li>
+      <li data-mov="der" style="--d: .16s"><span class="etiqueta">Instagram</span><a href="https://www.instagram.com/agenciamarta/" target="_blank" rel="noopener">@agenciamarta</a></li>
+      <li data-mov="der" style="--d: .24s"><span class="etiqueta">LinkedIn</span><a href="https://www.linkedin.com/company/108857338/" target="_blank" rel="noopener">Marta en LinkedIn</a></li>
+    </ul>
   </div>
   <footer class="pie ancho">
     <a class="pie-logo" data-mov="izq" href="#portada" aria-label="marta marketing digital, ir al inicio">
       <svg viewBox="0 0 1256 352" aria-hidden="true" focusable="false"><use href="#logo-fijo"/><use href="#logo-a"/></svg>
     </a>
-    <nav aria-label="Pie" data-mov="der" style="--d: .1s"><a href="#servicios">Servicios</a><a href="#proyectos">Proyectos</a><a href="#equipo">Equipo</a><a href="#contacto">Contacto</a></nav>
+    <nav aria-label="Pie" data-mov="der" style="--d: .1s"><a href="#servicios">Servicios</a><a href="#portfolio">Portfolio</a><a href="#sobre">Sobre Marta</a><a href="#contacto">Contacto</a></nav>
     <span data-mov="der" style="--d: .2s">© <span id="anio">2026</span> marta marketing digital</span>
   </footer>
 </section>

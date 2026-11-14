@@ -7,7 +7,8 @@ HTML + CSS + JS sin frameworks ni build.
 - `index.html`: estructura. Al principio del body, un sprite SVG con el logo vectorizado del original: `#logo-fijo` (m, rta, MARKETING, DIGITAL) y `#logo-a` (la "a" cortada, aparte porque es el rodillo). viewBox del logo: `0 0 1256 352`.
 - `css/styles.css`: todos los estilos, tokens en `:root`.
 - `js/main.js`: motor de scroll (array `tareas`, una pasada por cuadro), `vidrio()` (filtro SVG de vidrio estriado por elemento), rodillo de la "a" (`window.marta.girar`), `foco()` reutilizable y cada sección.
-- `img/a.svg`: la "a" cortada sola (favicon).
+- `img/a.svg`: la "a" cortada sola (favicon). `img/belen.jpg`: foto de Belén (recortada para sacar un neón azul).
+- `portfolio/<marca>/`: material de la clienta ya comprimido. `mini/N.jpg` y `mini/v1.jpg` (480 px, carrusel), `fotos/N.jpg` (1600 px), `videos/N.mp4` (H.264, 540 px de ancho o 960 si es horizontal) + `videos/N.jpg` (portada del video). Los originales vinieron en un zip de 1,8 GB; no subir originales al repo.
 - `fonts/`: acá van los .woff2 de Neutral Sans (todavía no están; se usa Geist de fallback).
 
 ## Identidad (manual de marca)
@@ -20,29 +21,29 @@ HTML + CSS + JS sin frameworks ni build.
 - Logo: "marta" en Special Gothic con la "a" cortada (pieza superior + cuenco) y "MARKETING ··· DIGITAL" debajo.
 
 ## Decisiones tomadas
-- Se reinició el sitio (oct 2026) y se rehizo como una landing continua: inicio (una pantalla: intro + presentación) → servicios (sección simple, sin fotos) → proyectos (pantalla fija de 650vh) → cinta → equipo → contacto (con pie). Servicios (nov 2026, pedido de la clienta): social media, branding y diseño, publicidad en Meta Ads. No hay sección Nosotros. Las secciones que siguen a servicios se van a rehacer: no pulirlas.
+- Se reinició el sitio (oct 2026) y se rehizo como una landing continua: inicio (una pantalla: intro + presentación) → servicios (sección simple, sin fotos) → portfolio (carrusel 3D) → sobre Marta (banda blanca, con Belén) → contacto (banda gris, WhatsApp/email/Instagram/LinkedIn, con pie). Servicios (nov 2026, pedido de la clienta): social media, branding y diseño, publicidad en Meta Ads. No hay sección Nosotros. Textos de cada sección: los pasó la clienta (nov 2026); no reescribirlos sin pedirlo.
 - Inicio: al terminar la intro, sola (sin scroll), el logo completo se corre y se achica hasta `.logo-destino` (a la derecha; en celular, arriba) y al lado entra la presentación ("las ideas sin estrategia son puro humo. acá preferimos que pasen cosas_", bajada y CTA "Quiero estrategia, no humo ↗"), que queda como pantalla inicial. No separar la "a" del logo ni ponerle las esquinas del visor en la presentación: la clienta dijo que así no representa la marca. Tramos en `T` y `pintarInicio(u)` en main.js.
-- Proyectos: un proyecto por pantalla de scroll; en cada cambio la foto que se va se deshace en canales de vidrio estriado y la nueva aparece desde el vidrio (franjas con `--g`/`--o`, solo transform y opacity), con el título reflejado abajo (concepto reflejo). Equipo enfoca cada retrato al llegar al centro.
+- Portfolio (nov 2026): título "si vamos a hablar de criterio, mejor mostrarlo_" y un carrusel circular en 3D (como el ejemplo que pasó la clienta) con piezas de cada marca; gira solo, se arrastra, se acelera con el scroll y tiene flechas. Al tocar una pieza se abre un `<dialog>` con todos los videos y fotos de esa marca. Las marcas y cuántas fotos/videos tiene cada una están en `trabajos` en main.js. Se frena con el botón de pausa, con el mouse encima o con el foco adentro. Con teclado solo la pieza de adelante recibe el foco (las flechas pasan de marca y Enter abre). Las imágenes (`mini/N.jpg` y `mini/v1.jpg`, 480 px) se cargan recién cuando el carrusel se acerca. La posición de cada pieza la calcula `pintarAnillo()` en JS (no usar `preserve-3d`/`perspective` de CSS: en Safari las piezas se encimaban). Equipo enfoca cada retrato al llegar al centro.
 - Efecto vidrio (`.vidrio` > `.lente`): feDisplacementMap con un mapa en diente de sierra generado en canvas; `--franja` define el ancho de cada canal, `--g` la intensidad. Las estrías de brillo van en `.vidrio::after`.
-- Header fijo con vidrio esmerilado: aparece pasada la portada, se esconde al bajar y vuelve al subir; barra de avance naranja.
-- Colores por banda: negro/carbón con naranja y crema; equipo en crema con negro y naranja; cinta y contacto en naranja solo con negro y blanco. 
+- Header fijo en crema esmerilado (texto negro, logo naranja, CTA "Hablemos"): aparece pasada la portada, se esconde al bajar y vuelve al subir; barra de avance naranja y la sección actual subrayada en naranja.
+- Colores por banda: inicio y portfolio en crema, servicios y sobre Marta en blanco, contacto en gris (crema y blanco encima). No queda ninguna banda negra. Naranja solo como acento y en botones con texto negro.
 - Efecto "foco" (`.foco` + `.foco-escena` + `.foco-blur` + `.visor`): la escena está desenfocada, un visor con esquinas naranjas la recorre, se frena en un objetivo y se abre hasta un marco. Se usa en la portada y en servicios.
-- Portada: pantalla borrosa → visor con esquinas naranjas recorre la pantalla → se frena en el logo → la "a" gira como tragamonedas → el visor se expande y todo queda nítido → queda la pantalla con el logo naranja centrado sobre negro (no hay header ni hero). Al pasar el mouse la "a" vuelve a girar. Se salta con clic/Esc (va directo al estado final); con `prefers-reduced-motion` se muestra el estado final.
+- Portada: pantalla borrosa → visor con esquinas naranjas recorre la pantalla → se frena en el logo → la "a" gira como tragamonedas → el visor se expande y todo queda nítido → queda la pantalla con el logo naranja centrado sobre negro (no hay header ni hero). Al pasar el mouse la "a" vuelve a girar. Se salta con clic/Esc (va directo al estado final); con `prefers-reduced-motion` se muestra el estado final. La intro completa se ve una vez por sesión (`sessionStorage` "marta-intro"); después se pasa directo a la presentación.
 - Servicios: título "te ayudamos a elegir qué necesita tu marca y eso también es estrategia_", 3 filas grandes (número, nombre, descripción) que se llenan de naranja al pasar el mouse, CTA "Hablemos de tu marca ↗". La clienta pidió pocas imágenes y animaciones acá.
 - Paleta (nov 2026, pedido de la clienta): salir del negro con naranja. El inicio va en crema (fondo crema, texto negro, destacado en gris) y el naranja queda solo como acento gráfico (la "a", guiones, fondo de botón; como texto sobre crema no llega al contraste). Las secciones que se rehagan siguen esta línea; las que todavía no se tocaron conservan el look oscuro.
 
 ## Pendientes
+- Cuando haya dominio, poner la URL completa en `og:image` (hoy `img/compartir.jpg`, relativa: WhatsApp y Facebook necesitan la URL completa para mostrar la vista previa).
 - SVG original del logo (el actual está vectorizado desde un PNG de 1667 px; coincide casi píxel a píxel, pero conviene el archivo del manual).
 - Archivos de Neutral Sans en `fonts/`.
-- Fotos reales: las de `img/ejemplos/` son de ejemplo (Unsplash vía picsum.photos, en B/N) para proyectos; los retratos del equipo siguen siendo placeholders CSS. También casos, nombres, email e Instagram reales.
-- Conectar el formulario (Formspree o backend).
+- Nombres reales de las marcas del portfolio (hoy figuran por rubro: Pastelería, Pizzería, etc.). LinkedIn: la clienta pasó el link del panel de admin; se usa el público (`/company/108857338/`), confirmar que abra bien.
 
 ## Vista previa publicada
 Artifact: https://claude.ai/artifact/SuYF71AnkwPgani7xNJbM8
 Para actualizarla: generar una página sin `<!doctype>/<html>/<head>/<body>` ni metas charset/viewport a partir de `index.html` (con `<meta name="claude:viewport-fit-sides" content="cover">` arriba) y publicarla con `url` = ese link, `root` = esta carpeta y `files` = css/styles.css, js/main.js, img/a.svg.
 
 ## Movimiento de textos
-Atributos en el HTML (ver styles.css y `partir()` en main.js): `data-letras` (letra por letra desde abajo, desenfocado y con giro), `data-palabras` (palabra por palabra), `data-mov="abajo|izq|der"` (bloque entero desde ese lado, demora en `--d`), `data-deriva="1|-1"` (título que se corre de costado con el scroll). Fuera de `.inicio` se activan con IntersectionObserver (`.mov-on`) y se reinician al salir por abajo; dentro de `.inicio` y `.proy` los activan `.panel-on` y `.proy-capa.activo`. Las bandas con movimiento llevan `overflow: clip`. Cerca del final de la página usar `izq`/`der` (no `abajo`), si no el elemento nunca llega a entrar.
+Atributos en el HTML (ver styles.css y `partir()` en main.js): `data-letras` (letra por letra desde abajo, desenfocado y con giro), `data-palabras` (palabra por palabra), `data-mov="abajo|izq|der"` (bloque entero desde ese lado, demora en `--d`), `data-deriva="1|-1"` (título que se corre de costado con el scroll). Fuera de `.inicio` se activan con IntersectionObserver (`.mov-on`) y se reinician al salir por abajo; dentro de `.inicio` los activa `.panel-on`. Las bandas con movimiento llevan `overflow: clip`. Cerca del final de la página usar `izq`/`der` (no `abajo`), si no el elemento nunca llega a entrar.
 
 ## Rendimiento
 Los efectos de scroll son tareas que corren una vez por cuadro (`tareas`). Las posiciones se miden solo al cargar y al cambiar el tamaño (`medidores`); durante el scroll no se leen medidas, solo se escriben estilos. Evitar filtros SVG/blur grandes animados: preferir transform y opacity.
