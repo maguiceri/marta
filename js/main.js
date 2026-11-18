@@ -104,122 +104,45 @@
   document.querySelectorAll(".strip").forEach(armarRodillo);
   window.marta = { girar };
 
-  // ---------- foco ----------
-  // Prepara la sección desenfocada. correr() hace el recorrido: el visor entra, pasa por dos puntos,
-  // se frena en el objetivo, ejecuta alEnfocar() y se abre hasta el marco final.
-  function foco(caja, { objetivo, alEnfocar = () => {}, marco = () => ({ x: 0, y: 0, w: caja.clientWidth, h: caja.clientHeight }), alTerminar = () => {} }) {
-    const escena = caja.querySelector(".foco-escena");
-    const capa = caja.querySelector(".foco-blur");
-    const estado = { corriendo: false, saltado: false, fin: false };
-
-    function ubicar(r) {
-      for (const k of ["x", "y", "w", "h"]) caja.style.setProperty("--" + k, r[k] + "px");
-    }
-    function rel(el) {
-      const a = el.getBoundingClientRect(), b = caja.getBoundingClientRect();
-      return { x: a.left - b.left, y: a.top - b.top, w: a.width, h: a.height };
-    }
-    // mueve el visor de un rectángulo a otro
-    function mover(a, b, ms, ease) {
-      return new Promise(res => {
-        const t0 = performance.now();
-        const paso = now => {
-          if (estado.saltado) return res();
-          const t = Math.min(1, (now - t0) / ms), e = ease(t);
-          ubicar({ x: lerp(a.x, b.x, e), y: lerp(a.y, b.y, e), w: lerp(a.w, b.w, e), h: lerp(a.h, b.h, e) });
-          t < 1 ? requestAnimationFrame(paso) : res();
-        };
-        requestAnimationFrame(paso);
-      });
-    }
-
-    function terminar() {
-      if (estado.fin) return;
-      estado.fin = true;
-      ubicar(marco());
-      capa.remove();
-      caja.classList.remove("foco-on");
-      caja.classList.add("abriendo", "foco-listo");
-      alTerminar();
-    }
-
-    function saltar() {
-      if (!estado.corriendo || estado.saltado || estado.fin) return;
-      estado.saltado = true;
-      capa.animate([{ opacity: getComputedStyle(capa).opacity }, { opacity: 0 }], { duration: 300, fill: "forwards" }).finished.then(terminar);
-    }
-
-    async function correr() {
-      if (estado.corriendo || estado.fin) return;
-      estado.corriendo = true;
-      if (reduce) return terminar();
-
-      const vw = caja.clientWidth, vh = caja.clientHeight;
-      const s = Math.round(Math.min(vw, vh) * .3);
-      const l = rel(objetivo);
-      const pad = Math.max(18, l.h * .22);
-      const p0 = { x: -s * 1.2, y: vh * .2, w: s, h: s };
-      const p2 = { x: vw * .1, y: vh * .58, w: s * .9, h: s * .9 };
-      const enObjetivo = { x: l.x - pad, y: l.y - pad, w: l.w + pad * 2, h: l.h + pad * 2 };
-
-      ubicar(p0);
-      caja.classList.add("visor-on");
-      await mover(p0, p2, 500, easeInOut);        if (estado.saltado) return;
-      await mover(p2, enObjetivo, 550, easeOut);  if (estado.saltado) return;
-
-      caja.classList.add("enfocado");
-      await alEnfocar();                           if (estado.saltado) return;
-      await pausa(60);
-
-      // el visor se abre y todo queda nítido
-      caja.classList.add("abriendo");
-      await mover(enObjetivo, marco(), 450, easeInOut); if (estado.saltado) return;
-      terminar();
-    }
-
-    if (reduce) terminar();
-    else {
-      const copia = escena.cloneNode(true);
-      copia.querySelectorAll("[id]").forEach(el => el.removeAttribute("id"));
-      capa.appendChild(copia);
-      capa.inert = true;
-      caja.classList.add("foco-on");
-      caja.addEventListener("click", saltar);
-    }
-    return { correr, saltar, terminar, estado };
-  }
-
   // ---------- portada ----------
+  // Al abrir: el logo en crema sobre negro y solo gira la segunda "a", como una tragamonedas.
+  // Después "inicio" corre el logo al costado, pasa el fondo a crema y muestra la presentación.
+  // La apertura se ve una vez por sesión; un clic, Esc, la rueda o deslizar la saltean.
   const portada = document.getElementById("portada");
   const logo = portada.querySelector(".portada-logo");
   const stripLogo = logo.querySelector(".strip");
-
+  const inicioEl = document.getElementById("inicio");
+  const intro = { fin: false };
   let alTerminarIntro = () => {};   // lo define "inicio": arranca la presentación
-  const intro = foco(portada, {
-    objetivo: logo,
-    alEnfocar: () => girar(stripLogo, 800),   // la "a" gira como una tragamonedas
-    alTerminar: () => {
-      html.classList.remove("intro-on");
-      document.getElementById("saltar")?.remove();
-      alTerminarIntro();
-      pedir();
-    }
-  });
 
-  // la intro completa se ve una vez por sesión; si ya se vio, se pasa directo a la presentación
+  function terminarIntro() {
+    if (intro.fin) return;
+    intro.fin = true;
+    html.classList.remove("intro-on");
+    alTerminarIntro();
+    pedir();
+  }
+
   let introVista = false;
   try { introVista = sessionStorage.getItem("marta-intro") === "1"; sessionStorage.setItem("marta-intro", "1"); } catch (_) {}
-  if (!reduce && introVista) {
-    intro.terminar();
-    document.getElementById("saltar")?.remove();
-  } else if (!reduce) {
+  if (reduce || introVista) {
+    inicioEl.classList.remove("oscuro");
+    terminarIntro();
+  } else {
     if ("scrollRestoration" in history) history.scrollRestoration = "manual";
     scrollTo(0, 0);
     html.classList.add("intro-on");
-    document.getElementById("saltar").addEventListener("click", e => { e.stopPropagation(); intro.saltar(); });
-    addEventListener("wheel", () => intro.saltar(), { passive: true, once: true });
-    addEventListener("touchmove", () => intro.saltar(), { passive: true, once: true });
-    (document.fonts?.ready ? Promise.race([document.fonts.ready, pausa(500)]) : Promise.resolve()).then(intro.correr);
+    inicioEl.addEventListener("click", terminarIntro, { once: true });
+    addEventListener("wheel", terminarIntro, { passive: true, once: true });
+    addEventListener("touchmove", terminarIntro, { passive: true, once: true });
+    (async () => {
+      if (document.fonts?.ready) await Promise.race([document.fonts.ready, pausa(500)]);
+      await pausa(400);
+      if (intro.fin) return;
+      await girar(stripLogo, 1100);
+      await pausa(350);
+      terminarIntro();
+    })();
   }
 
   // ---------- medidas ----------
@@ -252,7 +175,7 @@
     inicio.classList.add("panel-on");           // .logo-destino solo se puede medir con el panel visible
     hasta = destino.getBoundingClientRect();
     inicio.classList.toggle("panel-on", panelOn);
-    if (intro.estado.fin) pintarInicio(uActual);
+    if (intro.fin) pintarInicio(uActual);
   });
 
   function pintarInicio(u) {
@@ -267,6 +190,7 @@
   }
 
   function presentar() {
+    inicio.classList.remove("oscuro");     // fondo y logo pasan a crema y naranja mientras el logo se corre
     if (reduce) return pintarInicio(FIN);
     const t0 = performance.now();
     const paso = now => {
@@ -279,9 +203,9 @@
   alTerminarIntro = presentar;
   // si la intro ya terminó antes de llegar acá (movimiento reducido o ya vista en la sesión),
   // se muestra la presentación cuando ya hay medidas
-  if (intro.estado.fin) requestAnimationFrame(() => reduce ? pintarInicio(FIN) : presentar());
+  if (intro.fin) requestAnimationFrame(() => reduce ? pintarInicio(FIN) : presentar());
   // al pasar el mouse, la "a" del logo vuelve a girar
-  logo.addEventListener("mouseenter", () => { if (intro.estado.fin) girar(stripLogo, 900); });
+  logo.addEventListener("mouseenter", () => { if (intro.fin) girar(stripLogo, 900); });
 
   // ---------- portfolio ----------
   // Carrusel circular en 3D. Las piezas salen de "trabajos" (carpetas en portfolio/<id>/:
@@ -457,9 +381,7 @@
     const r = rutaMarca(t);
     const videos = Array.from({ length: t.videos }, (_, k) =>
       `<video src="${r}/videos/${k + 1}.mp4" poster="${r}/videos/${k + 1}.jpg" controls playsinline preload="metadata"></video>`);
-    const fotos = Array.from({ length: t.fotos }, (_, k) =>
-      `<img src="${r}/fotos/${k + 1}.jpg" alt="${t.nombre}, foto ${k + 1}" loading="lazy">`);
-    grillaTrab.innerHTML = [...videos, ...fotos].join("");
+    grillaTrab.innerHTML = videos.join("");   // la clienta pidió que el detalle muestre solo videos
     visorTrab.showModal();
   }
   document.getElementById("trabCerrar").addEventListener("click", () => visorTrab.close());
@@ -574,7 +496,7 @@
 
   addEventListener("keydown", e => {
     if (e.key !== "Escape") return;
-    intro.saltar();
+    terminarIntro();
     cerrarMenu();
   });
 

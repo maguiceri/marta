@@ -159,41 +159,6 @@ button { font: inherit; color: inherit; }
 .strip { will-change: transform; }
 .strip.girando { filter: url(#blur-giro); }
 
-/* ---------- foco ----------
-   La escena está desenfocada y un visor la recorre: donde está el visor se ve nítido.
-   .foco-blur es una copia desenfocada de la escena con un agujero (máscara) en el visor.
-   Lo usa la intro de la portada; las posiciones (--x --y --w --h) son relativas a la sección. */
-.foco { --x: -200vw; --y: 0px; --w: 10px; --h: 10px; position: relative; overflow: hidden; }
-.foco.foco-on { cursor: pointer; }
-.foco-blur {
-  position: absolute; inset: 0; overflow: hidden; pointer-events: none;
-  -webkit-mask-image: linear-gradient(#000, #000), linear-gradient(#000, #000);
-  -webkit-mask-position: var(--x) var(--y), 0 0;
-  -webkit-mask-size: var(--w) var(--h), 100% 100%;
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-composite: xor;
-  mask-image: linear-gradient(#000, #000), linear-gradient(#000, #000);
-  mask-position: var(--x) var(--y), 0 0;
-  mask-size: var(--w) var(--h), 100% 100%;
-  mask-repeat: no-repeat;
-  mask-composite: exclude;
-}
-.foco-blur > .foco-escena { filter: blur(16px); transform: scale(1.03); }
-.foco.abriendo .foco-blur { opacity: 0; transition: opacity .35s .4s; }
-.visor {
-  position: absolute; left: 0; top: 0; width: var(--w); height: var(--h);
-  transform: translate(var(--x), var(--y));
-  border: 1px solid rgba(255, 238, 210, .22);
-  opacity: 0; transition: opacity .3s, border-color .4s; pointer-events: none;
-}
-.esq { position: absolute; width: 22px; height: 22px; border: 0 solid var(--naranja); transition: width .5s, height .5s, border-color .5s; }
-.esq.tl { top: -1px; left: -1px; border-top-width: 2px; border-left-width: 2px; }
-.esq.tr { top: -1px; right: -1px; border-top-width: 2px; border-right-width: 2px; }
-.esq.bl { bottom: -1px; left: -1px; border-bottom-width: 2px; border-left-width: 2px; }
-.esq.br { bottom: -1px; right: -1px; border-bottom-width: 2px; border-right-width: 2px; }
-.foco.visor-on .visor { opacity: 1; }
-.foco.enfocado .visor { border-color: rgba(255, 98, 5, .55); }
-
 /* ---------- inicio ----------
    Paleta crema (pedido de la clienta: salir del negro con naranja): fondo crema, texto negro,
    destacado en gris; el naranja solo como acento gráfico (la "a", guiones, fondo de botón),
@@ -201,44 +166,31 @@ button { font: inherit; color: inherit; }
    Una pantalla. Al terminar la intro, main.js corre el logo hasta .logo-destino y anima
    --f (0→1 se van los datos de las esquinas) y --panel (entra la presentación). */
 html.intro-on { overflow: hidden; }
-.inicio { position: relative; height: 100vh; height: 100svh; background: var(--crema); color: var(--noche); }
+/* .oscuro: la apertura (logo crema sobre negro, como el manual). Al presentar, main.js la saca
+   y fondo y logo pasan a crema y naranja mientras el logo se corre al costado. */
+.inicio { position: relative; height: 100vh; height: 100svh; background: var(--crema); color: var(--noche); transition: background-color .9s ease; }
+.inicio.oscuro { background: var(--noche); }
 .inicio :focus-visible { outline-color: var(--noche); }
 .inicio-pin { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
 
-.portada { position: absolute; inset: 0; background: var(--crema); }
-.portada .foco-escena { position: absolute; inset: 0; display: grid; place-items: center; background: var(--crema); }
-.portada .foco-escena::before {
+.portada { position: absolute; inset: 0; }
+.portada-escena { position: absolute; inset: 0; display: grid; place-items: center; }
+.portada-escena::before {
   content: ""; position: absolute; inset: 0;
   background:
     radial-gradient(38% 34% at 72% 30%, rgba(255, 98, 5, .2), transparent 70%),
     radial-gradient(32% 30% at 18% 76%, rgba(12, 12, 12, .05), transparent 70%);
-  opacity: calc(1 - var(--f, 0) * .5);
+  opacity: .5; transition: opacity .9s;
 }
-.portada-logo { position: relative; z-index: 1; margin: 0; width: min(80vw, 1040px); color: var(--naranja); transform-origin: 0 0; }
-.dato { position: absolute; font-size: var(--s-label); letter-spacing: .16em; text-transform: uppercase; color: var(--noche-soft); opacity: calc(1 - var(--f, 0) * 1.5); }
-.dato.d2 { bottom: 32px; left: var(--gutter-l); }
-.dato.d3 { top: 32px; left: var(--gutter-l); }
-.dato.d4 { bottom: 32px; right: var(--gutter-r); display: flex; align-items: center; gap: 10px; opacity: 1; }   /* "Scroll" queda en la presentación */
-/* cuando ya se desvanecieron, los datos de las esquinas se ocultan del todo (no se copian ni los lee el lector de pantalla) */
-.inicio.sin-datos .dato:not(.d4) { visibility: hidden; }
+.inicio.oscuro .portada-escena::before { opacity: 0; }
+.portada-logo { position: relative; z-index: 1; margin: 0; width: min(80vw, 1040px); color: var(--naranja); transform-origin: 0 0; transition: color .9s ease; }
+.inicio.oscuro .portada-logo { color: var(--crema); }
+.inicio.oscuro { cursor: pointer; }   /* un clic saltea la apertura */
+.dato { position: absolute; font-size: var(--s-label); letter-spacing: .16em; text-transform: uppercase; color: var(--noche-soft); }
+.dato.d4 { bottom: 32px; right: var(--gutter-r); display: flex; align-items: center; gap: 10px; }   /* "Scroll" aparece con la presentación */
+.inicio:not(.panel-on) .dato.d4 { visibility: hidden; }
 .dato.d4::after { content: ""; width: 1px; height: 28px; background: var(--naranja); animation: baja 1.8s var(--curva) infinite; transform-origin: top; }
 @keyframes baja { 0% { transform: scaleY(0); } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
-.portada.abriendo .visor { opacity: 0; transition: opacity .4s .3s; }
-.portada.foco-listo .visor { display: none; }
-.portada:not(.foco-listo) .dato.d4 { visibility: hidden; }
-/* si el JS se corta a mitad de la intro, igual se termina viendo el logo */
-.portada .foco-blur, .portada .visor, .saltar { animation: intro-failsafe .4s 8s forwards; }
-@keyframes intro-failsafe { to { opacity: 0; visibility: hidden; } }
-.saltar {
-  position: absolute; z-index: 2;
-  right: var(--gutter-r);
-  bottom: calc(28px + env(safe-area-inset-bottom, 0px));
-  background: none; border: 1px solid var(--linea-oscura); color: var(--noche-soft);
-  font: 500 var(--s-label)/1 var(--texto); letter-spacing: .14em; text-transform: uppercase;
-  padding: 14px 16px; cursor: pointer; transition: color .2s, border-color .2s;
-}
-.saltar:hover { color: var(--noche); border-color: var(--noche); }
-.portada .visor { border-color: rgba(12, 12, 12, .25); }
 
 /* presentación: texto a la izquierda, la "a" a la derecha (en celular, la "a" arriba) */
 .presenta {
